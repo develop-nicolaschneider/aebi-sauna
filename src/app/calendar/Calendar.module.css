@@ -1,0 +1,61 @@
+.rangeCalendar {
+}
+
+.rangeCalendar [data-selected="true"] {
+    /*background-color: blue;*/
+}
+.rangeCalendar [data-selected-start="true"] [data-selected-end="true"] {
+    background-color: green !important;
+}
+.rangeCalendar [data-disabled="true"] {
+    background-color: lightgray;
+    color: gray;
+}
+.rangeCalendar [data-invalid="true"] {
+    background-color: lightgray;
+    color: red;
+}
+
+.base {
+
+}
+
+.prevButton {
+
+}
+
+.nextButton {
+
+}
+
+.header {
+
+}
+.title {
+    color: black;
+}
+.gridHeader {
+    color: black;
+}
+.gridHeaderRow {
+    color: black;
+}
+
+.cell {
+    color: black;
+    background-color: #6a5d5d;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.cellButton {
+    color: black;
+    display: block;
+    cursor: pointer;
+}
+.cellButton:hover {
+    background-color: lightgray;
+}
+
