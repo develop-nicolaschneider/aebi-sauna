@@ -14,17 +14,17 @@ export default function Footer() {
                 </a>
             </div>
             <div id="footer-impressum">
-                <Link href={"./"}>
+                <Link href={"/impressum"}>
                     Impressum
                 </Link>
             </div>
-            <div id="footer-diclaimer">
-                <Link href={"./"}>
+            <div id="footer-disclaimer">
+                <Link href={"/disclaimer"}>
                     Disclaimer
                 </Link>
             </div>
             <div id="footer-poweredby">
-                Powered by © <a>nicolaschneider.ch</a>
+                Powered by <a href="https://nicolaschneider.ch" target="_blank">©nicolaschneider</a>
             </div>
         </footer>
     )

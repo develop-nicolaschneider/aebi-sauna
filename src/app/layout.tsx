@@ -12,18 +12,16 @@ export const metadata: Metadata = {
     description: "Dampfwage - Die mobile Sauna!",
 }
 
-export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+export default function RootLayout({children}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="de">
-        <body className={inter.className}>
-            <Header/>
-            {children}
-            <Footer/>
-        </body>
+            <body className={inter.className}>
+                <Header/>
+                {children}
+                <Footer/>
+            </body>
         </html>
     )
 }
