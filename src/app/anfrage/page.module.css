@@ -1,0 +1,14 @@
+.rangeCalendar {
+    .title {
+        color: black;
+    }
+    .gridHeader {
+        color: black;
+    }
+    .gridHeaderRow {
+        color: black;
+    }
+    .prevButton, .nextButton {
+        color: black;
+    }
+}
