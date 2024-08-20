@@ -1,9 +1,8 @@
-import {DateFormatter} from "@internationalized/date";
+import {DateFormatter} from "@internationalized/date"
 
 const ConvertToChDate = (date: string, precise = false) => {
     const formatter =
-        (precise) ?
-            new DateFormatter(
+        (precise) ? new DateFormatter(
                 "de-CH", {
                     weekday: "long",
                     day: "2-digit",
@@ -13,8 +12,7 @@ const ConvertToChDate = (date: string, precise = false) => {
                     minute: "2-digit",
                     second: "2-digit",
                 }
-            )
-            :
+            ) :
             new DateFormatter(
                 "de-CH", {
                     day: "2-digit",
@@ -22,9 +20,11 @@ const ConvertToChDate = (date: string, precise = false) => {
                     year: "numeric",
                 }
             )
-
-
-    return formatter.format(new Date(date))
+    try {
+        return formatter.format(new Date(date))
+    } catch (e: any) {
+        return ""
+    }
 }
 
 export default ConvertToChDate

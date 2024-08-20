@@ -1,12 +1,12 @@
 'use server'
 
 import {db} from "../../config/firebase"
-import {collection, doc, serverTimestamp, writeBatch} from "@firebase/firestore"
+import {collection, doc, getDoc, serverTimestamp, writeBatch} from "@firebase/firestore"
 import BookingState from "@/utils/BookingState"
 import {redirect} from "next/navigation"
-import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema";
+import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
 
-const addBooking = async (data:  {[p: string]: FormDataEntryValue}) => {
+const addBooking = async (data: { [p: string]: FormDataEntryValue }) => {
     const result = AnfrageFormSchema.safeParse(data)
     if (!result.success) {
         return result.error.flatten()
@@ -32,13 +32,36 @@ const addBooking = async (data:  {[p: string]: FormDataEntryValue}) => {
     }
     transaction.set(bookingDocRef, bookingData)
     try {
-        await transaction.commit()
         console.log("transaction success")
+        await transaction.commit()
     } catch (e: any) {
-        console.log(e)
+        console.error(e)
         return e.error
     }
-    redirect(`/anfrage/${bookingDocRef.id}`)
+    redirect(`/anfrage/meine-anfragen?buchungId=${bookingDocRef.id}`)
 }
 
-export {addBooking}
+// const getBookingById: ({params: {id}}: { params: { id: string } }) => Promise<any> = async ({params: {id}}: {
+//     params: { id: string }
+// }) => {
+const getBookingById = async (id: string) => {
+    let booking: any | null = null
+    let user: any | null | undefined = null
+    const bookingDocRef = doc(db, 'bookings', id)
+    console.log('bookingDocRef', bookingDocRef)
+    const bookingDocSnap = await getDoc(bookingDocRef)
+    console.log("bookingDocSnap", bookingDocSnap.exists())
+    if (bookingDocSnap.exists())
+        booking = {id: bookingDocSnap.id, ...bookingDocSnap.data() as Object | undefined}
+    if (!booking) return null
+    const userDocRef = booking.user
+    const userDocSnap = await getDoc(userDocRef)
+    if (bookingDocSnap.exists())
+        user = {id: userDocSnap.id, ...userDocSnap.data() as Object | undefined}
+    if (!user) return null
+    booking.booking_date = booking.booking_date.toDate()
+    booking.user = user
+    return {booking}
+}
+
+export {addBooking, getBookingById}

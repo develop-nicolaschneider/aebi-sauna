@@ -13,11 +13,13 @@ import {Checkbox} from "@nextui-org/checkbox"
 import {Link} from "@nextui-org/link"
 import {ModalComponent} from "@/components/ModalComponent"
 import {addBooking} from "@/utils/firebase"
+import {BookingTable} from "@/components/BookingTable";
+import ConvertToChDate from "@/utils/ConvertToChDate";
 
 export default function Anfrage() {
     console.log("start")
     const {isOpen, onOpen, onOpenChange} = useDisclosure()
-    const [checkboxSelected, setCheckboxSelected] = React.useState([""])
+    const [checkboxSelected, setCheckboxSelected] = useState([""])
     const [modalContent, setModalContent] = useState({
         title: "",
         handleAction: () => {
@@ -46,7 +48,6 @@ export default function Anfrage() {
     const AgbComponent = () => <div>Content for Modal 1</div>
     const DataProtectionComponent = () => <div>Content for Modal 2</div>
     const UsageProtectionComponent = () => <div>Content for Modal 3</div>
-    const AnfrageCheck = () => <div>Content for Modal 4</div>
 
     const userFields = [
         {
@@ -180,11 +181,68 @@ export default function Anfrage() {
             return
         }
         setErrors({})
+        const formCheckRows = [
+            {
+                key: '1',
+                description: 'Datum von',
+                value: data ? ConvertToChDate(data?.booking_from.toString()) : ''
+            },
+            {
+                key: '2',
+                description: 'Datum bis',
+                value: data ? ConvertToChDate(data?.booking_to.toString()) : ''
+            },
+            {
+                key: '3',
+                description: 'Email',
+                value: data ? data?.email.toString() : ''
+            },
+            {
+                key: '4',
+                description: 'Telefonnummer',
+                value: data ? data?.phoneNumber.toString() : ''
+            },
+            {
+                key: '5',
+                description: 'Vorname',
+                value: data ? data?.firstName.toString() : '',
+            },
+            {
+                key: '6',
+                description: 'Nachname',
+                value: data ? data?.lastName.toString() : ''
+            },
+            {
+                key: '7',
+                description: 'Strasse',
+                value: data ? data?.street.toString() : ''
+            },
+            {
+                key: '8',
+                description: 'Postleitzahl',
+                value: data ? data?.postalCode.toString() : ''
+            },
+            {
+                key: '9',
+                description: 'Ort',
+                value: data ? data?.city.toString() : ''
+            }
+        ]
+        const formCheckColumns = [
+            {
+                key: 'description',
+                label: 'Beschreibung'
+            },
+            {
+                key: 'value',
+                label: 'Wert'
+            }
+        ]
         const formCheckModal = {
             title: "Angaben Prüfen",
             handleAction: () => handleFormCheck(data),
             actionText: "Senden",
-            content: <AnfrageCheck/>
+            content: <BookingTable columns={formCheckColumns} rows={formCheckRows}/>
         }
         setModalContent(formCheckModal)
         handleModalOpen(formCheckModal)
@@ -217,12 +275,17 @@ export default function Anfrage() {
 
     useEffect(() => {
         (async () => {
-            const bookingsRef = collection(db, 'bookings')
-            const bookingsSnap = await getDocs(bookingsRef)
-            const list = bookingsSnap.docs.map(doc => {
-                return {id: doc.id, ...doc.data()}
-            })
-            setBookings(list)
+            try {
+                const bookingsRef = collection(db, 'bookings')
+                const bookingsSnap = await getDocs(bookingsRef)
+                const list = bookingsSnap.docs.map(doc => {
+                    return {id: doc.id, ...doc.data()}
+                })
+                console.log(list)
+                setBookings(list)
+            } catch (error) {
+                console.error(error)
+            }
         })()
     }, [setBookings])
 
@@ -324,7 +387,13 @@ export default function Anfrage() {
                     </div>
                 ))}
             </CheckboxGroup>
-            <Button name="submitButton" id="submitButton" variant="light" type="submit">Anfrage senden</Button>
+            <Button
+                name="submitButton"
+                id="submitButton"
+                variant="light"
+                type="submit"
+                size="sm"
+            >Anfrage senden</Button>
             <ModalComponent isOpen={isOpen} onOpenChange={onOpenChange} modalContent={modalContent}/>
         </form>
     )
