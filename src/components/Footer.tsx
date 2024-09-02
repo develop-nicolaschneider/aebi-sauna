@@ -24,7 +24,7 @@ export default function Footer() {
                 </Link>
             </div>
             <div id="footer-poweredby">
-                Powered by <a href="https://nicolaschneider.ch" target="_blank">©nicolaschneider</a>
+                Powered by <a href="https://nicolaschneider.ch" target="_blank">&copy;nicolaschneider</a>
             </div>
         </footer>
     )

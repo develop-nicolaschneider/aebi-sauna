@@ -11,33 +11,23 @@ import {
     TableRow,
     Tooltip
 } from "@nextui-org/react"
-import BookingState from "@/utils/BookingState"
+import {BookingStateColor, BookingStateStatus, getKeyByValue} from "@/utils/BookingState"
+import React from "react";
 
 type BookingTableProps = {
     rows: { key: string, description: string, value: string }[]
     columns: { key: string, label: string }[]
+    bottomContent?: React.JSX.Element | undefined
 }
 
-export const BookingTable = ({rows, columns}: BookingTableProps) => {
-
-    const statusColorMap: Record<string, "danger" | "success" | "warning"> = {
-        PENDING: 'warning',
-        CONFIRMED: 'success',
-        CANCELLED: 'danger',
-    }
-    const statusTooltipMap: Record<string, string> = {
-        PENDING: 'Anfrage wird geprüft',
-        CONFIRMED: 'Anfrage wurde bestätigt',
-        CANCELLED: 'Anfrage wurde abgelehnt',
-    }
-
-    function getKeyByValue(value: string) {
-        const key = Object.keys(BookingState).find(key => BookingState[key] === value)
-        return key ? key : "PRIMARY"
-    }
+export const BookingTable = ({rows, columns, bottomContent = undefined}: BookingTableProps) => {
 
     return (
-        <Table aria-label="Buchungstabelle" selectionMode="single">
+        <Table
+            aria-label="Buchungstabelle"
+            selectionMode="single"
+            hideHeader
+            bottomContent={bottomContent !== undefined ? bottomContent : ''}>
             <TableHeader columns={columns}>
                 {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
             </TableHeader>
@@ -46,9 +36,9 @@ export const BookingTable = ({rows, columns}: BookingTableProps) => {
                     <TableRow key={item.key}>
                         {(columnKey) =>
                             <TableCell>
-                                {statusTooltipMap[getKeyByValue(item['value'])] && columnKey === 'value' ?
-                                    <Tooltip content={statusTooltipMap[getKeyByValue(item['value'])]}>
-                                        <Chip color={statusColorMap[getKeyByValue(item['value'])]} variant="flat">
+                                {BookingStateStatus[getKeyByValue(item['value'])] && columnKey === 'value' ?
+                                    <Tooltip content={BookingStateStatus[getKeyByValue(item['value'])]}>
+                                        <Chip color={BookingStateColor[getKeyByValue(item['value'])]} variant="flat">
                                             {getKeyValue(item, columnKey)}
                                         </Chip>
                                     </Tooltip> :

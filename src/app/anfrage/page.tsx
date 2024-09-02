@@ -1,50 +1,51 @@
 'use client'
 
-import {getLocalTimeZone, today, parseDate, CalendarDate} from "@internationalized/date"
+import {getLocalTimeZone, today, parseDate, CalendarDate, DateDuration} from "@internationalized/date"
 import styles from "@/app/anfrage/page.module.css"
-import {
-    Input, Button, RangeCalendar, useDisclosure, DateValue, CheckboxGroup
-} from "@nextui-org/react"
+import {Input, Button, RangeCalendar, useDisclosure, DateValue, CheckboxGroup} from "@nextui-org/react"
 import React, {Fragment, useCallback, useEffect, useState} from "react"
 import {db} from "../../../config/firebase"
-import {collection, getDocs} from "@firebase/firestore"
+import {collection, onSnapshot} from "@firebase/firestore"
 import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
 import {Checkbox} from "@nextui-org/checkbox"
 import {Link} from "@nextui-org/link"
 import {ModalComponent} from "@/components/ModalComponent"
-import {addBooking} from "@/utils/firebase"
-import {BookingTable} from "@/components/BookingTable";
-import ConvertToChDate from "@/utils/ConvertToChDate";
+import {addBooking, Booking} from "@/utils/firebase"
+import {BookingTable} from "@/components/BookingTable"
+import ConvertToChDate from "@/utils/ConvertToChDate"
 
 export default function Anfrage() {
-    console.log("start")
+    const maxBookingDate: DateDuration = {days: 365}
+    const maxBookingDuration: DateDuration = {days: 14}
+    const maxBookingDurationMessage = `Max. Buchungsdauer: ${Number(maxBookingDuration.days)} Tage. Längere Buchungsdauer bitte per Email anfragen!`
     const {isOpen, onOpen, onOpenChange} = useDisclosure()
-    const [checkboxSelected, setCheckboxSelected] = useState([""])
+    const [checkboxSelected, setCheckboxSelected] = useState([''])
     const [modalContent, setModalContent] = useState({
-        title: "",
+        title: '',
         handleAction: () => {
         },
-        actionText: "",
+        actionText: '',
         content: <Fragment/>,
     })
     const [bookings, setBookings] = useState<any[]>([])
     const [errors, setErrors] = useState<any>({})
+    const minValue = today(getLocalTimeZone())
+    const maxValue = minValue.add(maxBookingDate)
+    const [focusedDate, setFocusedDate] = useState(minValue)
+    const [selectedRange, setSelectedRange] = useState({
+        start: minValue,
+        end: minValue
+    })
     const disabledRanges = bookings.map(booking => [
-        parseDate(booking.booking_from), parseDate(booking.booking_to)
+        parseDate(booking?.booking_from), parseDate(booking?.booking_to)
     ])
     const isDateUnavailable = useCallback((date: DateValue) => {
         return disabledRanges.some(
             (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
         )
     }, [disabledRanges])
-    const minValue = today(getLocalTimeZone())
-    const maxValue = minValue.add({years: 1})
-    const [focusedDate, setFocusedDate] = useState(minValue)
-    const maxBooking = minValue.add({months: 1})
-    const [selectedRange, setSelectedRange] = useState({
-        start: minValue,
-        end: minValue
-    })
+    let isInvalid = selectedRange?.start ? selectedRange.end > selectedRange.start.add(maxBookingDuration) : false
+
     const AgbComponent = () => <div>Content for Modal 1</div>
     const DataProtectionComponent = () => <div>Content for Modal 2</div>
     const UsageProtectionComponent = () => <div>Content for Modal 3</div>
@@ -107,26 +108,6 @@ export default function Anfrage() {
             autoComplete: 'city'
         },
     ]
-    const bookingFields = [
-        {
-            name: 'booking_from',
-            label: 'Datum von',
-            isReadOnly: true,
-            min: minValue.toString(),
-            max: maxValue.toString(),
-            value: selectedRange?.start.toString(),
-            range: {start: null, end: selectedRange?.end},
-        },
-        {
-            name: 'booking_to',
-            label: 'Datum bis',
-            isReadOnly: true,
-            min: selectedRange?.start.toString(),
-            max: maxBooking.toString(),
-            value: selectedRange?.end.toString(),
-            range: {start: selectedRange?.start, end: null},
-        },
-    ]
     const checkboxFields = [
         {
             name: "agbRegulations",
@@ -168,11 +149,13 @@ export default function Anfrage() {
         // client actions
         e.preventDefault()
         const data = Object.fromEntries(new FormData(e.currentTarget))
+        data['booking_from'] = selectedRange.start.toString()
+        data['booking_to'] = selectedRange.end.toString()
         if (isDateUnavailable(parseDate(data.booking_from as string))) {
-            data.booking_from = ""
+            data.booking_from = ''
         }
-        if (isDateUnavailable(parseDate(data.booking_to as string))) {
-            data.booking_to = ""
+        if (isDateUnavailable(parseDate(data.booking_to as string)) || isInvalid) {
+            data.booking_to = ''
         }
         const result = AnfrageFormSchema.safeParse(data)
         if (!result.success) {
@@ -185,47 +168,47 @@ export default function Anfrage() {
             {
                 key: '1',
                 description: 'Datum von',
-                value: data ? ConvertToChDate(data?.booking_from.toString()) : ''
+                value: data ? ConvertToChDate(data.booking_from.toString()) as string : ''
             },
             {
                 key: '2',
                 description: 'Datum bis',
-                value: data ? ConvertToChDate(data?.booking_to.toString()) : ''
+                value: data ? ConvertToChDate(data.booking_to.toString()) as string : ''
             },
             {
                 key: '3',
                 description: 'Email',
-                value: data ? data?.email.toString() : ''
+                value: data ? data.email.toString() as string : ''
             },
             {
                 key: '4',
                 description: 'Telefonnummer',
-                value: data ? data?.phoneNumber.toString() : ''
+                value: data ? data.phoneNumber.toString() as string : ''
             },
             {
                 key: '5',
                 description: 'Vorname',
-                value: data ? data?.firstName.toString() : '',
+                value: data ? data.firstName.toString() as string : '',
             },
             {
                 key: '6',
                 description: 'Nachname',
-                value: data ? data?.lastName.toString() : ''
+                value: data ? data.lastName.toString() as string : ''
             },
             {
                 key: '7',
                 description: 'Strasse',
-                value: data ? data?.street.toString() : ''
+                value: data ? data.street.toString() as string : ''
             },
             {
                 key: '8',
                 description: 'Postleitzahl',
-                value: data ? data?.postalCode.toString() : ''
+                value: data ? data.postalCode.toString() as string : ''
             },
             {
                 key: '9',
                 description: 'Ort',
-                value: data ? data?.city.toString() : ''
+                value: data ? data.city.toString() as string : ''
             }
         ]
         const formCheckColumns = [
@@ -274,37 +257,19 @@ export default function Anfrage() {
     }
 
     useEffect(() => {
-        (async () => {
-            try {
-                const bookingsRef = collection(db, 'bookings')
-                const bookingsSnap = await getDocs(bookingsRef)
-                const list = bookingsSnap.docs.map(doc => {
-                    return {id: doc.id, ...doc.data()}
-                })
-                console.log(list)
-                setBookings(list)
-            } catch (error) {
-                console.error(error)
-            }
-        })()
+        const bookingsRef = collection(db, 'bookings')
+        const unsubscribe = onSnapshot(bookingsRef, snapshot => {
+            const list = snapshot.docs.map(booking => {
+                return {
+                    id: booking.id,
+                    booking_from: booking.get('booking_from')?.toString() as string ?? '',
+                    booking_to: booking.get('booking_to')?.toString() as string ?? ''
+                } as Booking
+            })
+            setBookings(list)
+        })
+        return () => unsubscribe()
     }, [setBookings])
-
-    // SNAPSHOT -> PULLING NEWEST DATA
-    // useEffect(() => {
-    //     (async () => {
-    //         console.log("useEffect")
-    //         const bookingsRef = collection(db, 'bookings')
-    //         const bookingsSnap = await onSnapshot(bookingsRef, snapshot => {
-    //             console.log("bookingSnap")
-    //             const list = snapshot.docs.map(doc => {
-    //                 return {id: doc.id, ...doc.data()}
-    //             })
-    //             console.log("list", list)
-    //             setBookings(list)
-    //         })
-    //         return bookingsSnap()
-    //     })()
-    // }, [])
 
     return (
         <form name='anfrageForm' onSubmit={handleSubmit}>
@@ -339,38 +304,14 @@ export default function Anfrage() {
                 minValue={minValue}
                 maxValue={maxValue}
                 isDateUnavailable={isDateUnavailable}
-                errorMessage={"Datum nicht verfügbar"}
+                isInvalid={isInvalid}
+                errorMessage={isInvalid ? maxBookingDurationMessage : undefined}
                 onChange={handleDateChange}
-                autoFocus={false}
-                pageBehavior="single"
                 focusedValue={focusedDate}
                 onFocusChange={setFocusedDate}
+                pageBehavior="single"
                 weekdayStyle="short"
             />
-            {bookingFields.map(({name, label, value, min, max, range}) => (
-                <Input
-                    name={name}
-                    id={name}
-                    key={name}
-                    label={label}
-                    title="Datum"
-                    readOnly
-                    type="date"
-                    autoComplete="off"
-                    variant="flat"
-                    labelPlacement="outside-left"
-                    isInvalid={!!errors?.fieldErrors?.[name]}
-                    errorMessage={errors?.fieldErrors?.[name]}
-                    value={value}
-                    onChange={e => handleDateChange({
-                        start: range.start ?? parseDate(e.target.value),
-                        end: range.end ?? parseDate(e.target.value)
-                    })}
-                    min={min}
-                    max={max}
-                    size="sm"
-                />
-            ))}
             <CheckboxGroup value={checkboxSelected} onValueChange={setCheckboxSelected}>
                 {checkboxFields.map(({name, text, modalContent}) => (
                     <div key={name}>
@@ -382,15 +323,18 @@ export default function Anfrage() {
                             isRequired
                             size="sm"
                         >Meine Zustimmung zu den
-                        </Checkbox><Link key={name + "-link"}
-                                         onPress={() => handleModalOpen(modalContent)}>&nbsp;{text}</Link>
+                        </Checkbox>
+                        <Link key={name + "-link"}
+                              onPress={() => handleModalOpen(modalContent)}
+                        >&nbsp;{text}</Link>
                     </div>
                 ))}
             </CheckboxGroup>
             <Button
                 name="submitButton"
                 id="submitButton"
-                variant="light"
+                variant="solid"
+                color="primary"
                 type="submit"
                 size="sm"
             >Anfrage senden</Button>
