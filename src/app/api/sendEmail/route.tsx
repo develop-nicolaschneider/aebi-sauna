@@ -1,21 +1,12 @@
-import {NextResponse} from "next/server"
+import {NextRequest, NextResponse} from "next/server"
 import nodemailer from 'nodemailer'
 import SMTPTransport from "nodemailer/lib/smtp-transport"
-import {Booking} from "@/utils/firebase"
+import {Booking} from "@/types/Booking"
 import ConfirmationEmailTemplate from "@/app/api/sendEmail/ConfirmationEmailTemplate"
 
-export async function POST(req: {
-    json: () => PromiseLike<{ email: string; subject: string; booking: Booking }> | {
-        email: string
-        subject: string
-        booking: Booking
-    }
-}) {
+export async function POST(req: NextRequest) {
     try {
-        const {email, subject, booking} = await req.json()
-        console.log(email)
-        console.log(subject)
-        console.log({booking})
+        const { email, subject, booking }: { email: string; subject: string; booking: Booking } = await req.json();
         const { renderToStaticMarkup } = await import( "react-dom/server" )
         const emailContent = renderToStaticMarkup( <ConfirmationEmailTemplate booking={booking}/> )
         const transporter = nodemailer.createTransport({
@@ -33,7 +24,6 @@ export async function POST(req: {
             subject: subject,
             html: emailContent
         }
-        console.log('sendEmail', mailOptions)
         await transporter.sendMail(mailOptions)
         return NextResponse.json(
             {message: 'Email sent successfully!'},

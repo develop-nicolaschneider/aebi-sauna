@@ -20,11 +20,14 @@ export const ModalComponent = (
     }: ModalProps) => {
 
     return (
-        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            scrollBehavior="outside"
+            size="lg">
             <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className="flex flex-col gap-1">{modalContent?.title}</ModalHeader>
                         <ModalBody>
                             {modalContent?.content}
                         </ModalBody>

@@ -11,11 +11,11 @@ import {
     TableRow,
     Tooltip
 } from "@nextui-org/react"
-import {BookingStateColor, BookingStateStatus, getKeyByValue} from "@/utils/BookingState"
+import {BookingStateColor, BookingStateStatus, getKeyByValue} from "@/types/BookingState"
 import React from "react";
 
 type BookingTableProps = {
-    rows: { key: string, description: string, value: string }[]
+    rows: { description: string, value: string }[]
     columns: { key: string, label: string }[]
     bottomContent?: React.JSX.Element | undefined
 }
@@ -24,6 +24,9 @@ export const BookingTable = ({rows, columns, bottomContent = undefined}: Booking
 
     return (
         <Table
+            classNames={{
+                td: 'text-xs sm:text-sm md:text-base',
+            }}
             aria-label="Buchungstabelle"
             selectionMode="single"
             hideHeader
@@ -33,7 +36,7 @@ export const BookingTable = ({rows, columns, bottomContent = undefined}: Booking
             </TableHeader>
             <TableBody items={rows}>
                 {(item) => (
-                    <TableRow key={item.key}>
+                    <TableRow key={item.description.toLowerCase().replace(' ', '')}>
                         {(columnKey) =>
                             <TableCell>
                                 {BookingStateStatus[getKeyByValue(item['value'])] && columnKey === 'value' ?

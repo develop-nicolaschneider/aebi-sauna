@@ -8,5 +8,6 @@ export const LoginFormSchema = z.object({
         .min(2, 'Eingabe ungültig')
         .email('Email ungültig'),
     password: z.string({invalid_type_error, required_error})
-        .min(2, 'Eingabe ungültig')
+        .min(2, 'Eingabe ungültig'),
+    rememberMe: z.optional(z.string())
 })

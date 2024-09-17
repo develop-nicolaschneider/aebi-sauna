@@ -12,10 +12,12 @@ export default async function middleware(req: NextRequest) {
 
     const cookie = cookies().get('session.dampfwage.ch')?.value
     const session = await decrypt(cookie)
-
-    if (isProtectedRoute && !session?.userId)
+    if (isProtectedRoute && !session?.uid) {
         return NextResponse.redirect(new URL('/login', req.nextUrl))
-    if (isPublicRoute && session?.userId && !req.nextUrl.pathname.startsWith('/dashboard'))
+    }
+    if (isPublicRoute && session?.userId && !req.nextUrl.pathname.startsWith('/dashboard')) {
         return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
-    return NextResponse.next()
+    }
+    const next = NextResponse.next()
+    return next
 }

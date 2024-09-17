@@ -7,12 +7,13 @@ import {
     ModalFooter,
     Button,
     Input,
-    RangeCalendar, DateValue
+    RangeCalendar, DateValue, Textarea
 } from "@nextui-org/react"
-import {Booking, updateBooking} from "@/utils/firebase"
+import {getBookings, updateBooking} from "@/utils/firebase"
 import {CalendarDate, getLocalTimeZone, parseDate, today} from "@internationalized/date"
 import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
 import styles from "@/app/anfrage/page.module.css"
+import {Booking} from "@/types/Booking"
 
 type ModalProps = {
     isOpen: boolean,
@@ -33,20 +34,26 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
     )
     const [focusedDate, setFocusedDate] = useState<CalendarDate>(start)
     const disabledRanges = bookingList?.map(bookingItem => {
-        if (booking !== undefined) {
-            if (bookingItem.booking_from !== booking.booking_from)
-                return [parseDate(bookingItem.booking_from), parseDate(bookingItem.booking_to)]
+        if (bookingItem !== null) {
+            if (bookingItem.booking_from !== '' && bookingItem.booking_to !== '') {
+                return ([
+                    parseDate(bookingItem.booking_from), parseDate(bookingItem.booking_to)
+                ])
+            }
         }
     })
-    const isDateUnavailable = (date: DateValue) => {
+    const isDateUnavailable = useCallback((date: DateValue) => {
         if (disabledRanges !== undefined) {
             return disabledRanges.some(
-                (interval) =>
-                    interval ? date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0 : false
+                (interval) => {
+                    if (interval !== undefined) {
+                        return interval ? date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0 : false
+                    }
+                }
             )
         }
         return false
-    }
+    }, [])
     const [errors, setErrors] = useState<any>({})
     const user = booking?.user
     const inputFields = [
@@ -111,11 +118,10 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
     const handleSave = async (e: { preventDefault: () => void; currentTarget: HTMLFormElement | undefined }) => {
         e.preventDefault()
         const data = Object.fromEntries(new FormData(e.currentTarget))
+        const checkBookings = await getBookings()
         data['booking_from'] = selectedRange.start.toString()
         data['booking_to'] = selectedRange.end.toString()
-        data['agbRegulations'] = 'on'
-        data['dataRegulations'] = 'on'
-        data['usageRegulations'] = 'on'
+        data['regulations'] = ''
         if (isDateUnavailable(parseDate(data.booking_from as string))) {
             data.booking_from = ''
         }
@@ -128,7 +134,6 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
             setErrors(result.error.flatten())
             return
         }
-        setErrors({})
         const response = await updateBooking(data)
         if (!response) {
             setErrors(response)
@@ -156,14 +161,18 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
     }, [booking])
 
     return (
-        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            scrollBehavior="outside">
             <ModalContent>
                 {onClose => {
                     onCloseRef.current = onClose
                     return (
                         <form name="editForm" onSubmit={handleSave}>
-                            <ModalHeader className="flex flex-col gap-1">Angaben bearbeiten</ModalHeader>
-                            <ModalBody>
+                            <ModalHeader id="modalHeader" className="flex flex-col gap-1">Angaben
+                                bearbeiten</ModalHeader>
+                            <ModalBody id="modalBody" className="grid justify-items-center h-fit">
                                 {inputFields.map(({name, label, placeholder, title, type, defaultValue}) => {
                                     return (
                                         <Input
@@ -177,16 +186,34 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
                                             defaultValue={defaultValue}
                                             isInvalid={!!errors?.fieldErrors?.[name]}
                                             errorMessage={errors?.fieldErrors?.[name]}
-                                            variant="flat"
+                                            variant="underlined"
                                             autoComplete="off"
                                             size="sm"
                                         />
                                     )
                                 })}
+                                <Textarea
+                                    classNames={{
+                                        description: 'text-zinc-400'
+                                    }}
+                                    maxLength={250}
+                                    id="remarks"
+                                    title="Bemerkungen"
+                                    name="remarks"
+                                    size="sm"
+                                    minRows={3}
+                                    maxRows={3}
+                                    variant="underlined"
+                                    label="Bemerkungen"
+                                    labelPlacement="inside"
+                                    placeholder="Zusätzliche Bemerkungen & Fragen eingeben"
+                                    description="Maximal 250 Zeichen"
+                                    defaultValue={booking?.remarks}
+                                />
                                 <RangeCalendar
                                     id="calendar"
                                     title="Kalender"
-                                    className={styles.rangeCalendar}
+                                    className="h-fit"
                                     classNames={{
                                         title: styles.title,
                                         gridHeader: styles.gridHeader,
@@ -194,6 +221,7 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
                                         prevButton: styles.prevButton,
                                         nextButton: styles.nextButton
                                     }}
+                                    calendarWidth={320}
                                     value={selectedRange}
                                     onChange={handleDateChange}
                                     isDateUnavailable={isDateUnavailable}
@@ -204,12 +232,13 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
                                     pageBehavior="single"
                                     weekdayStyle="short"
                                 />
-                                <span className="text-default-400 text-small">
+                                <span className="text-default-400 text-xs">
                                     Beim Ändern von Personendaten werden alle Daten angepasst, welche unter dieser Email abgespeichert wurden.
                                 </span>
                             </ModalBody>
-                            <ModalFooter>
+                            <ModalFooter id="modalFooter">
                                 <Button
+                                    id="close-button"
                                     color="default"
                                     variant="light"
                                     onPress={onClose}

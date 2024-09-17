@@ -1,6 +1,6 @@
 import {DateFormatter} from "@internationalized/date"
 
-const ConvertToChDate = (date: string, precise: 'sd' | 'sd-full' | 'md' | 'md-full' | 'ld' | 'ld-full' = 'md') => {
+const ConvertToChDate = (date: string, precise: 'sd' | 'sd-full' | 'md' | 'md-full' | 'ld' | 'dy' | 'ld-full' = 'md') => {
     let formatter
     switch (precise) {
         // short date
@@ -64,6 +64,13 @@ const ConvertToChDate = (date: string, precise: 'sd' | 'sd-full' | 'md' | 'md-fu
                     hour: '2-digit',
                     minute: '2-digit',
                     second: '2-digit',
+                })
+            break
+        case 'dy':
+            formatter = new DateFormatter(
+                'de-CH', {
+                    month: 'long',
+                    year: 'numeric'
                 })
             break
         default:

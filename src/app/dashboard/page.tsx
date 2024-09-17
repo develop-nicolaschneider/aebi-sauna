@@ -1,6 +1,5 @@
 'use client'
 
-import LogoutIcon from '@mui/icons-material/Logout'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import {
     Button,
@@ -26,11 +25,11 @@ import {
     SharedSelection,
     Selection,
     useDisclosure,
-    ButtonGroup
+    ButtonGroup, Badge
 } from "@nextui-org/react"
-import {Booking, deleteBooking, getBookings, logout, updateBookingState} from "@/utils/firebase"
+import {deleteBooking, getBookings, updateBookingState} from "@/utils/firebase"
 import React, {Fragment, useCallback, useMemo, useState} from "react"
-import {BookingDateFilter, BookingState, getColorByValue, getDateFilterKey, getKeyByValue} from "@/utils/BookingState"
+import {BookingDateFilter, BookingState, getColorByValue, getDateFilterKey, getKeyByValue} from "@/types/BookingState"
 import ConvertToChDate from "@/utils/ConvertToChDate"
 import {useAsyncList} from "@react-stately/data"
 import EditIcon from '@mui/icons-material/Edit'
@@ -42,6 +41,11 @@ import {EditBookingModal} from "@/components/EditBookingModal"
 import {ModalComponent} from "@/components/ModalComponent"
 import {BookingTable} from "@/components/BookingTable"
 import {getLocalTimeZone, parseDate, today} from "@internationalized/date"
+import {Booking} from "@/types/Booking"
+import CommentIcon from '@mui/icons-material/Comment'
+import {BookingUser} from "@/types/BookingUser"
+import {Link} from "@nextui-org/link"
+import {Loading, LoadingAnimation} from "@/components/base/Loading"
 
 const bookingColumns = [
     {key: "user", label: "Kontakt"},
@@ -53,6 +57,7 @@ const bookingColumns = [
 ]
 
 const Dashboard = () => {
+    const [loading, setLoading] = useState(true)
     const [filterValue, setFilterValue] = useState('')
     const [statusFilter, setStatusFilter] = useState<Selection>('all')
     const [dateFilter, setDateFilter] = useState<Selection>('all')
@@ -71,6 +76,7 @@ const Dashboard = () => {
 
     let list = useAsyncList<Booking>({
         async load() {
+            setLoading(true)
             const bookingList = await getBookings(false)
             const initialStates: Record<string, string> = {}
             if (bookingList !== null) {
@@ -78,16 +84,8 @@ const Dashboard = () => {
                     initialStates[booking.id] = getKeyByValue(booking.booking_state)
                 })
             }
-            const sortedItems = bookingList?.sort((a, b) => {
-                return new Date(a.booking_from).getTime() - new Date(b.booking_from).getTime()
-            }) || []
-            return {
-                items: sortedItems,
-                sortDescriptor: {
-                    column: 'booking_from',
-                    direction: 'ascending'
-                }
-            }
+            setLoading(false)
+            return {items: bookingList || []}
         },
         async sort({items, sortDescriptor}) {
             return {
@@ -133,9 +131,9 @@ const Dashboard = () => {
         if (dateFilter !== 'all' && Array.from(dateFilter).length !== Object.entries(BookingDateFilter).length) {
             filteredBookings = filteredBookings.filter((booking) => {
                 if (Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.OLD_ENTRIES))) {
-                    return parseDate(booking.booking_from).compare(today(getLocalTimeZone())) < 0
+                    return parseDate(booking.booking_to).compare(today(getLocalTimeZone())) < 0
                 } else if (Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.NEW_ENTRIES))) {
-                    return parseDate(booking.booking_from).compare(today(getLocalTimeZone())) > 0
+                    return parseDate(booking.booking_to).compare(today(getLocalTimeZone())) >= 0
                 }
             })
         }
@@ -146,27 +144,29 @@ const Dashboard = () => {
         if (id && value.currentKey) {
             try {
                 await updateBookingState(id, BookingState[value.currentKey]).then()
-                if (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && BookingState.CONFIRMED === BookingState[value.currentKey]) {
-                    try {
-                        const res = await fetch('api/sendEmail', {
-                            method: 'POST',
-                            headers: {'content-type': 'application/json'},
-                            body: JSON.stringify({
-                                email: booking?.user?.id,
-                                subject: 'Buchungsbestätigung',
-                                booking: booking
-                            })
-                        })
-                        await res.json()
-                        if (res.ok) {
-                            console.log(res)
-                        } else {
-                            console.log(res)
-                        }
-                    } catch (error) {
-                        console.error(error)
-                    }
-                }
+                // ToDo Email temp for BookingState CONFIRMED
+
+                // if (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && BookingState.CONFIRMED === BookingState[value.currentKey]) {
+                //     try {
+                //         const res = await fetch('api/sendEmail', {
+                //             method: 'POST',
+                //             headers: {'content-type': 'application/json'},
+                //             body: JSON.stringify({
+                //                 email: booking?.user?.id,
+                //                 subject: 'Buchungsbestätigung',
+                //                 booking: booking
+                //             })
+                //         })
+                //         await res.json()
+                //         if (res.ok) {
+                //             console.log(res)
+                //         } else {
+                //             console.error(res)
+                //         }
+                //     } catch (error) {
+                //         console.error(error)
+                //     }
+                // }
                 list.reload()
             } catch (error) {
                 console.error(error)
@@ -277,6 +277,7 @@ const Dashboard = () => {
             <div className="flex flex-col gap-1">
                 <div className="flex justify-between gap-1">
                     <Input
+                        name="searchInput"
                         className="min-w-40 max-w-[44%]"
                         isClearable
                         onClear={() => setFilterValue('')}
@@ -316,6 +317,7 @@ const Dashboard = () => {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
+                                id="statusDropdown"
                                 disallowEmptySelection
                                 aria-label="Buchung Status"
                                 closeOnSelect={false}
@@ -323,21 +325,13 @@ const Dashboard = () => {
                                 selectionMode="multiple"
                                 onSelectionChange={setStatusFilter}>
                                 {Object.entries(BookingState).map(([key, value]) => (
-                                    <DropdownItem key={key} className="capitalize">
+                                    <DropdownItem key={key} id={`${key}-${value}`} className="capitalize">
                                         {value}
                                     </DropdownItem>
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
                     </ButtonGroup>
-                    <Button
-                        name="logoutButton"
-                        isIconOnly
-                        onPress={() => logout()}
-                        variant="flat"
-                        size="md">
-                        <LogoutIcon/>
-                    </Button>
                 </div>
             </div>
         )
@@ -350,31 +344,68 @@ const Dashboard = () => {
         )
     }, [list])
 
-    const renderCell = (booking: any, columnKey: any) => {
-        console.log('renderCell')
+    const renderCell = (booking: Booking, columnKey: any) => {
+        let user = booking.user
+        if (user === null) {
+            user = {
+                id: '',
+                firstName: '',
+                lastName: '',
+                email: '',
+                phoneNumber: '',
+                street: '',
+                postalCode: '',
+                city: '',
+            } as BookingUser
+        }
         switch (columnKey) {
             case 'user':
-                const fullName = booking.user.firstName + ' ' + booking.user.lastName
-                const address = booking.user.postalCode + ' ' + booking.user.city
+                const fullName = user.firstName + ' ' + user.lastName
+                const address = user.postalCode + ' ' + user.city
                 return (
-                    <Popover showArrow>
+                    <Popover size="sm">
                         <PopoverTrigger>
-                            <User name={fullName}
-                                  description={booking.user.id}
-                                  avatarProps={{
-                                      fallback: <AlternateEmailIcon/>,
-                                      color: getColorByValue(booking.booking_state),
-                                  }}
-                            />
+                            <Badge
+                                title="Bemerkungen"
+                                isInvisible={booking.remarks === undefined || booking.remarks === ''}
+                                content={<CommentIcon fontSize="small"/>}
+                                color="danger"
+                                size="sm"
+                                placement="top-left">
+                                <Popover showArrow>
+                                    <PopoverTrigger>
+                                        <User
+                                            title="Anfrage von"
+                                            name={fullName}
+                                            description={user.id}
+                                            avatarProps={{
+                                                fallback: <AlternateEmailIcon/>,
+                                                color: getColorByValue(booking.booking_state),
+                                            }}
+                                        />
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <div>
+                                            {fullName}<br/>
+                                            {user.phoneNumber}<br/>
+                                            <Link
+                                                color="foreground"
+                                                className="text-sm"
+                                                isExternal
+                                                href={`mailto:${user.id}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer">
+                                                {user.id}
+                                            </Link><br/>
+                                            {user.street}<br/>
+                                            {address}
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            </Badge>
                         </PopoverTrigger>
-                        <PopoverContent>
-                            <div>
-                                {fullName}<br/>
-                                {booking.user.phoneNumber}<br/>
-                                {booking.user.id}<br/>
-                                {booking.user.street}<br/>
-                                {address}
-                            </div>
+                        <PopoverContent className="max-w-md">
+                            {booking.remarks}
                         </PopoverContent>
                     </Popover>
                 )
@@ -385,6 +416,7 @@ const Dashboard = () => {
             case 'booking_state':
                 return (
                     <Select
+                        name="bookingStatus"
                         aria-label="Buchungsstatus wählen"
                         className={"min-w-44 max-w-min"}
                         items={Object.entries(BookingState)}
@@ -393,13 +425,14 @@ const Dashboard = () => {
                         defaultSelectedKeys={booking ? [getKeyByValue(booking.booking_state)] : []}
                         onSelectionChange={selection => {
                             setSelectedState(selection)
-                            handleSelectChange(booking.id, selection, booking)
+                            handleSelectChange(booking.id, selection, booking).then()
                         }}
                         renderValue={(items) => {
                             return (
                                 <div>
                                     {items.map((item) => (
                                         <Chip
+                                            id={`chip-${item.key}`}
                                             className={"min-w-32 max-w-min text-center"}
                                             color={item.textValue ? getColorByValue(item.textValue) : 'default'}
                                             key={item.key}>{item.textValue}</Chip>
@@ -409,7 +442,7 @@ const Dashboard = () => {
                         }}
                     >
                         {Object.entries(BookingState).map(([key, value]) => (
-                            <SelectItem key={key}>
+                            <SelectItem id={key} key={key}>
                                 {value}
                             </SelectItem>
                         ))}
@@ -442,8 +475,9 @@ const Dashboard = () => {
     }
 
     return (
-        <>
+        <Loading>
             <Table
+                className="mt-5"
                 aria-label="Buchungstabelle"
                 topContent={topContent}
                 bottomContent={bottomContent}
@@ -459,6 +493,8 @@ const Dashboard = () => {
                     )}
                 </TableHeader>
                 <TableBody
+                    isLoading={loading}
+                    loadingContent={<LoadingAnimation/>}
                     emptyContent={"Keine Buchungen vorhanden"}
                     items={filteredItems}>
                     {(item) => (
@@ -484,7 +520,7 @@ const Dashboard = () => {
                 isOpen={isDeleteOpen}
                 onOpenChange={onDeleteOpenChange}
                 modalContent={modalContent}/>
-        </>
+        </Loading>
     )
 }
 

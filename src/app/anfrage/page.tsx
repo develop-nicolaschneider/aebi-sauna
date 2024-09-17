@@ -1,25 +1,45 @@
 'use client'
 
-import {getLocalTimeZone, today, parseDate, CalendarDate, DateDuration} from "@internationalized/date"
+import {
+    getLocalTimeZone,
+    today,
+    parseDate,
+    getDayOfWeek,
+    isWeekend,
+    CalendarDate,
+    DateDuration
+} from "@internationalized/date"
 import styles from "@/app/anfrage/page.module.css"
-import {Input, Button, RangeCalendar, useDisclosure, DateValue, CheckboxGroup} from "@nextui-org/react"
+import {
+    Input, Textarea, Button,
+    DateValue, RangeCalendar, useDisclosure, Tooltip, Switch,
+} from "@nextui-org/react"
 import React, {Fragment, useCallback, useEffect, useState} from "react"
-import {db} from "../../../config/firebase"
-import {collection, onSnapshot} from "@firebase/firestore"
 import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
 import {Checkbox} from "@nextui-org/checkbox"
 import {Link} from "@nextui-org/link"
 import {ModalComponent} from "@/components/ModalComponent"
-import {addBooking, Booking} from "@/utils/firebase"
+import {addBooking, getBookings} from "@/utils/firebase"
 import {BookingTable} from "@/components/BookingTable"
 import ConvertToChDate from "@/utils/ConvertToChDate"
+import {usePathname, useRouter, useSearchParams} from "next/navigation"
+import {Booking} from "@/types/Booking"
+import {Fade} from "react-awesome-reveal"
+import {LoadingProgressAnimation} from "@/components/base/Loading"
+import Disclaimer from "@/app/disclaimer/page"
+import UsageRegulations from "@/components/UsageRegulations"
 
 export default function Anfrage() {
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
     const maxBookingDate: DateDuration = {days: 365}
     const maxBookingDuration: DateDuration = {days: 14}
-    const maxBookingDurationMessage = `Max. Buchungsdauer: ${Number(maxBookingDuration.days)} Tage. Längere Buchungsdauer bitte per Email anfragen!`
+    const maxBookingDurationMessage = `Max. Buchungsdauer: ${Number(maxBookingDuration.days)} Tage. Längere Buchungsdauer bitte in den Bemerkungen angeben.`
     const {isOpen, onOpen, onOpenChange} = useDisclosure()
-    const [checkboxSelected, setCheckboxSelected] = useState([''])
+    const [loading, setLoading] = useState<boolean>(false)
+    const [isSelected, setIsSelected] = React.useState(false)
+    const [regulationsAgreed, setRegulationsAgreed] = useState(false)
     const [modalContent, setModalContent] = useState({
         title: '',
         handleAction: () => {
@@ -27,7 +47,7 @@ export default function Anfrage() {
         actionText: '',
         content: <Fragment/>,
     })
-    const [bookings, setBookings] = useState<any[]>([])
+    const [bookings, setBookings] = useState<Booking[]>([])
     const [errors, setErrors] = useState<any>({})
     const minValue = today(getLocalTimeZone())
     const maxValue = minValue.add(maxBookingDate)
@@ -36,21 +56,60 @@ export default function Anfrage() {
         start: minValue,
         end: minValue
     })
-    const disabledRanges = bookings.map(booking => [
-        parseDate(booking?.booking_from), parseDate(booking?.booking_to)
-    ])
+    const disabledRanges = bookings.map(booking => {
+        if (booking != null) {
+            if (booking.booking_from !== '' && booking.booking_to !== '') {
+                return ([
+                    parseDate(booking?.booking_from), parseDate(booking?.booking_to)
+                ])
+            }
+        }
+    })
     const isDateUnavailable = useCallback((date: DateValue) => {
-        return disabledRanges.some(
-            (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
-        )
+        if (disabledRanges !== undefined) {
+            return disabledRanges.some(
+                (interval) => {
+                    if (interval !== undefined) {
+                        return date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0
+                    }
+                }
+            )
+        }
+        return false
     }, [disabledRanges])
+
+    function isDateFromBookingsUnavailable(bookings: Booking[], date: DateValue) {
+        console.log(bookings, date)
+        if (bookings.length > 0) {
+            return bookings.some(
+                (booking) => {
+                    if (booking.booking_from !== '' && booking.booking_to !== '') {
+                        return date.compare(parseDate(booking?.booking_from)) >= 0 && date.compare(parseDate(booking?.booking_to)) <= 0
+                    }
+                    return false
+                }
+            )
+        }
+        return false
+    }
+
     let isInvalid = selectedRange?.start ? selectedRange.end > selectedRange.start.add(maxBookingDuration) : false
 
-    const AgbComponent = () => <div>Content for Modal 1</div>
-    const DataProtectionComponent = () => <div>Content for Modal 2</div>
-    const UsageProtectionComponent = () => <div>Content for Modal 3</div>
+    const DataProtectionComponent = () => <Disclaimer/>
+    const UsageProtectionComponent = () => <UsageRegulations/>
 
-    const userFields = [
+
+    type UserFieldsType = {
+        name: string,
+        label: string,
+        placeholder: string,
+        title: string,
+        type: 'text' | 'number' | 'email' | 'tel',
+        autoComplete: string,
+        className?: string
+    }
+
+    const userFields: UserFieldsType[] = [
         {
             name: 'firstName',
             label: 'Vorname',
@@ -94,10 +153,11 @@ export default function Anfrage() {
         {
             name: 'postalCode',
             label: 'Postleitzahl',
-            placeholder: 'PLZ eingeben',
+            placeholder: 'PLZ',
             title: 'Postleitzahl',
             type: 'number',
-            autoComplete: 'postal-code'
+            autoComplete: 'postal-code',
+            className: 'min-w-24 max-w-min'
         },
         {
             name: 'city',
@@ -105,26 +165,17 @@ export default function Anfrage() {
             placeholder: 'Ort eingeben',
             title: 'Ort',
             type: 'text',
-            autoComplete: 'city'
+            autoComplete: 'address-level2',
+            className: 'w-full'
         },
     ]
     const checkboxFields = [
         {
-            name: "agbRegulations",
-            text: "AGBs",
-            modalContent: {
-                title: "Allgemeine Geschäftsbedingungen",
-                handleAction: () => handleModalAction("agbRegulations"),
-                actionText: "Akzeptieren",
-                content: <AgbComponent/>,
-            }
-        },
-        {
             name: "dataRegulations",
-            text: "Datenschutzerklärungen",
+            text: "Datenschutzbestimmungen",
             modalContent: {
                 title: "Datenschutzerklärungen",
-                handleAction: () => handleModalAction("dataRegulations"),
+                handleAction: () => handleModalAction(true),
                 actionText: "Akzeptieren",
                 content: <DataProtectionComponent/>,
             }
@@ -134,7 +185,7 @@ export default function Anfrage() {
             text: "Nutzungsbestimmungen",
             modalContent: {
                 title: "Nutzungsbestimmungen",
-                handleAction: () => handleModalAction("usageRegulations"),
+                handleAction: () => handleModalAction(true),
                 actionText: "Akzeptieren",
                 content: <UsageProtectionComponent/>,
             }
@@ -142,22 +193,45 @@ export default function Anfrage() {
     ]
 
     const handleDateChange = useCallback((range: { start: CalendarDate, end: CalendarDate }) => {
-        setSelectedRange(range)
+        // check if start or end is weekend
+        let correctedRange = range
+        if (isWeekend(range.start, 'de-CH') || isWeekend(range.end, 'de-CH')) {
+            console.log('isWeekend', range)
+            console.log(getDayOfWeek(range.start, 'de-CH'), getDayOfWeek(range.end, 'de-CH'))
+            if (getDayOfWeek(range.start, 'de-CH') === 6) {
+                console.log('start === sunday')
+                correctedRange = {start: range.start.add({days: -1}), end: range.end}
+            }
+            if (getDayOfWeek(range.end, 'de-CH') === 5) {
+                console.log('end === saturday')
+                correctedRange = {start: range.start, end: range.end.add({days: 1})}
+            }
+        }
+        setSelectedRange(correctedRange)
     }, [setSelectedRange])
 
     const handleSubmit = async (e: { preventDefault: () => void; currentTarget: HTMLFormElement | undefined }) => {
         // client actions
         e.preventDefault()
         const data = Object.fromEntries(new FormData(e.currentTarget))
-        data['booking_from'] = selectedRange.start.toString()
-        data['booking_to'] = selectedRange.end.toString()
-        if (isDateUnavailable(parseDate(data.booking_from as string))) {
-            data.booking_from = ''
-        }
-        if (isDateUnavailable(parseDate(data.booking_to as string)) || isInvalid) {
-            data.booking_to = ''
+        const checkBookings = await getBookings()
+        data['booking_from'] = isSelected ? selectedRange.start.toString() : ''
+        data['booking_to'] = isSelected ? selectedRange.end.toString() : ''
+        console.log(data)
+
+        if (checkBookings !== null) {
+            setBookings(checkBookings)
+            if (selectedRange.start.toString() !== '' && selectedRange.end.toString() !== '') {
+                if (isDateFromBookingsUnavailable(checkBookings, selectedRange.start)) {
+                    data.booking_from = ''
+                }
+                if (isDateFromBookingsUnavailable(checkBookings, selectedRange.start)) {
+                    data.booking_to = ''
+                }
+            }
         }
         const result = AnfrageFormSchema.safeParse(data)
+        console.log(result)
         if (!result.success) {
             setErrors(result.error.flatten())
             setFocusedDate(selectedRange?.start ? selectedRange?.start : minValue)
@@ -166,49 +240,44 @@ export default function Anfrage() {
         setErrors({})
         const formCheckRows = [
             {
-                key: '1',
-                description: 'Datum von',
-                value: data ? ConvertToChDate(data.booking_from.toString()) as string : ''
-            },
-            {
-                key: '2',
-                description: 'Datum bis',
-                value: data ? ConvertToChDate(data.booking_to.toString()) as string : ''
-            },
-            {
-                key: '3',
                 description: 'Email',
                 value: data ? data.email.toString() as string : ''
             },
             {
-                key: '4',
                 description: 'Telefonnummer',
                 value: data ? data.phoneNumber.toString() as string : ''
             },
             {
-                key: '5',
                 description: 'Vorname',
                 value: data ? data.firstName.toString() as string : '',
             },
             {
-                key: '6',
                 description: 'Nachname',
                 value: data ? data.lastName.toString() as string : ''
             },
             {
-                key: '7',
                 description: 'Strasse',
                 value: data ? data.street.toString() as string : ''
             },
             {
-                key: '8',
                 description: 'Postleitzahl',
                 value: data ? data.postalCode.toString() as string : ''
             },
             {
-                key: '9',
                 description: 'Ort',
                 value: data ? data.city.toString() as string : ''
+            },
+            {
+                description: 'Datum von',
+                value: data ? ConvertToChDate(data.booking_from.toString()) as string : ''
+            },
+            {
+                description: 'Datum bis',
+                value: data ? ConvertToChDate(data.booking_to.toString()) as string : ''
+            },
+            {
+                description: 'Bemerkungen',
+                value: data ? data.remarks.toString() as string : ''
             }
         ]
         const formCheckColumns = [
@@ -241,104 +310,202 @@ export default function Anfrage() {
         onOpen()
     }
 
-    const handleModalAction = (selected: string) => {
-        setCheckboxSelected([selected, ...checkboxSelected])
+    const handleModalAction = (selected: boolean) => {
+        setRegulationsAgreed(selected)
     }
 
     const handleFormCheck = async (data: { [p: string]: FormDataEntryValue }) => {
         // server actions
+        setLoading(true)
         const response = await addBooking(data)
-        if (!response?.success) {
+        if (response.type === 'validation') {
             setErrors(response)
             setFocusedDate(selectedRange?.start ? selectedRange?.start : minValue)
             return
+        } else if (response.type === 'server') {
+            // ToDo server error handling
+            setErrors({})
+        } else if (response.type === 'success') {
+            setErrors({})
+            const booking = response.booking
+            if (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && booking.user !== null) {
+                const res = await fetch('api/sendEmail', {
+                    method: 'POST',
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({
+                        email: booking.user?.email,
+                        subject: 'Anfrage bestätigt',
+                        booking: booking
+                    })
+                })
+                await res.json()
+                if (!res.ok) {
+                    // ToDO server error handling
+                }
+            }
+            const params = new URLSearchParams(searchParams.toString())
+            params.set('buchungId', booking.id)
+            router.push(`${pathname}/meine-anfrage?${params.toString()}`)
         }
-        setErrors({})
+        setLoading(false)
     }
 
     useEffect(() => {
-        const bookingsRef = collection(db, 'bookings')
-        const unsubscribe = onSnapshot(bookingsRef, snapshot => {
-            const list = snapshot.docs.map(booking => {
-                return {
-                    id: booking.id,
-                    booking_from: booking.get('booking_from')?.toString() as string ?? '',
-                    booking_to: booking.get('booking_to')?.toString() as string ?? ''
-                } as Booking
-            })
-            setBookings(list)
-        })
-        return () => unsubscribe()
+        (async () => {
+            const bookings = await getBookings()
+            if (bookings !== null)
+                setBookings(bookings)
+        })()
     }, [setBookings])
 
     return (
-        <form name='anfrageForm' onSubmit={handleSubmit}>
-            {userFields.map(({name, label, placeholder, title, type, autoComplete}) => (
-                <Input
-                    name={name}
-                    id={name}
-                    key={name}
-                    label={label}
-                    placeholder={placeholder}
-                    title={title}
-                    type={type ?? 'text'}
-                    autoComplete={autoComplete}
-                    variant="flat"
-                    isInvalid={!!errors?.fieldErrors?.[name]}
-                    errorMessage={errors?.fieldErrors?.[name]}
-                    size="sm"
-                />
-            ))}
-            <RangeCalendar
-                id="calendar"
-                title="Kalender"
-                className={styles.rangeCalendar}
-                classNames={{
-                    title: styles.title,
-                    gridHeader: styles.gridHeader,
-                    gridHeaderRow: styles.gridHeaderRow,
-                    prevButton: styles.prevButton,
-                    nextButton: styles.nextButton
-                }}
-                value={selectedRange}
-                minValue={minValue}
-                maxValue={maxValue}
-                isDateUnavailable={isDateUnavailable}
-                isInvalid={isInvalid}
-                errorMessage={isInvalid ? maxBookingDurationMessage : undefined}
-                onChange={handleDateChange}
-                focusedValue={focusedDate}
-                onFocusChange={setFocusedDate}
-                pageBehavior="single"
-                weekdayStyle="short"
-            />
-            <CheckboxGroup value={checkboxSelected} onValueChange={setCheckboxSelected}>
-                {checkboxFields.map(({name, text, modalContent}) => (
-                    <div key={name}>
-                        <Checkbox
-                            name={name}
-                            key={name + "-checkbox"}
-                            value={name}
-                            isInvalid={!!errors?.fieldErrors?.[name]}
-                            isRequired
-                            size="sm"
-                        >Meine Zustimmung zu den
-                        </Checkbox>
-                        <Link key={name + "-link"}
-                              onPress={() => handleModalOpen(modalContent)}
-                        >&nbsp;{text}</Link>
+        <form name='anfrageForm' onSubmit={handleSubmit} className="grow">
+            {!loading ?
+                <Fade triggerOnce duration={500}>
+                    <div
+                        id="anfrage-div"
+                        className="grid sm:grid-cols-1 md:grid-cols-2 gap-4 justify-items-center content-center py-7">
+                        <h1 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl md:col-span-2">Anfrage
+                            senden</h1>
+                        <p className="text-xs sm:text-xs md:text-sm lg:text-base mb-2 md:col-span-2 text-center">
+                            Sende Deine Anfrage zur Saunamiete jetzt! Wähle Deine Wunschdaten zur Saunamiete direkt
+                            im
+                            Kalender.
+                            Bei Fragen und Miete von längerer Dauer nutze das Feld
+                            <span className="font-bold">&nbsp;Bemerkungen&nbsp;</span>oder sende mir eine E-Mail:
+                            <Link
+                                className="text-xs sm:text-xs md:text-sm lg:text-base"
+                                isExternal
+                                href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage&body=Hallo Tobias%0A%0AMein Anliegen zum Dampfwage:"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                &nbsp;dampfwage@gmail.com
+                            </Link>.
+                        </p>
+                        <div className="grid grid-cols-1 gap-y-3 w-full max-w-md">
+                            {userFields.map((userField, index) => {
+                                function getInput(field: UserFieldsType) {
+                                    return <Input
+                                        key={field.name}
+                                        name={field.name}
+                                        id={field.name}
+                                        label={field.label}
+                                        placeholder={field.placeholder}
+                                        title={field.title}
+                                        type={field.type === 'number' ? 'text' : field.type}
+                                        inputMode={field.type === 'number' ? 'numeric' : field.type}
+                                        autoComplete={field.autoComplete}
+                                        isInvalid={!!errors?.fieldErrors?.[field.name]}
+                                        errorMessage={errors?.fieldErrors?.[field.name]}
+                                        variant="underlined"
+                                        size="sm"
+                                        className={field.className + ' col-start-1'}
+                                    />
+                                }
+
+                                if (userFields[index].name !== 'postalCode' && userFields[index].name !== 'city') {
+                                    return getInput(userField)
+                                } else if (userFields[index].name === 'postalCode' && userFields[index + 1]) {
+                                    return (
+                                        <div key="postalCode-city-div" className="flex w-full gap-x-2 col-start-1">
+                                            {getInput(userField)}
+                                            {getInput(userFields[index + 1])}
+                                        </div>
+                                    )
+                                }
+                            })}
+                            <Textarea
+                                classNames={{
+                                    description: 'text-zinc-400'
+                                }}
+                                maxLength={250}
+                                id="remarks"
+                                name="remarks"
+                                title="Bemerkungen"
+                                size="sm"
+                                minRows={3}
+                                maxRows={3}
+                                variant="underlined"
+                                label="Bemerkungen"
+                                labelPlacement="inside"
+                                placeholder="Zusätzliche Bemerkungen & Fragen eingeben"
+                                description="Maximal 250 Zeichen"
+                            />
+                        </div>
+                        <div className="flex flex-col justify-center items-center h-full py-4 gap-1">
+                            <Tooltip
+                                showArrow
+                                color="primary"
+                                closeDelay={0}
+                                content="Wunschdatum optional wählen">
+                                <RangeCalendar
+                                    isDisabled={!isSelected}
+                                    id="calendar"
+                                    className="col-start-1 md:col-start-2"
+                                    classNames={{
+                                        title: styles.title,
+                                        gridHeader: styles.gridHeader,
+                                        gridHeaderRow: styles.gridHeaderRow,
+                                        prevButton: styles.prevButton,
+                                        nextButton: styles.nextButton
+                                    }}
+                                    calendarWidth={320}
+                                    value={selectedRange}
+                                    minValue={minValue.add({days: 1})}
+                                    maxValue={maxValue}
+                                    isDateUnavailable={isDateUnavailable}
+                                    isInvalid={isInvalid}
+                                    errorMessage={isInvalid ? maxBookingDurationMessage :
+                                        (selectedRange?.start.toString() === today(getLocalTimeZone()).toString() ? ' ' : 'Datum nicht verfügbar.')}
+                                    onChange={handleDateChange}
+                                    focusedValue={focusedDate}
+                                    onFocusChange={setFocusedDate}
+                                    pageBehavior="single"
+                                    weekdayStyle="short"
+                                />
+                            </Tooltip>
+                            <Switch size="sm" isSelected={isSelected} onValueChange={setIsSelected}>
+                                Wunschdatum wählen
+                            </Switch>
+                            <small className="text-center leading-5">
+                                Wochenendanfragen nur Sa+So möglich.
+                            </small>
+                        </div>
+                        <div className="text-center h-full self-center leading-5">
+                            <Checkbox
+                                isSelected={regulationsAgreed}
+                                onValueChange={setRegulationsAgreed}
+                                classNames={{label: 'text-xs'}}
+                                name="regulations"
+                                key="ragulations"
+                                isInvalid={!!errors?.fieldErrors?.['regulations']}
+                                isRequired
+                                size="sm"
+                            >Ich akzeptiere die</Checkbox>
+                            {checkboxFields.map(({name, text, modalContent}, index) => (
+                                <Link
+                                    size="sm"
+                                    className="hover:cursor-pointer text-xs"
+                                    key={name + "-link"}
+                                    onPress={() => handleModalOpen(modalContent)}
+                                >&nbsp;{text}{index < checkboxFields.length - 2 ? ',' : index === checkboxFields.length - 1 ? '.' : ' &'}</Link>
+                            ))}
+                        </div>
+                        <Button
+                            name="submitButton"
+                            id="submitButton"
+                            variant="shadow"
+                            color="primary"
+                            type="submit"
+                            size="md"
+                            className="self-center"
+                            isDisabled={loading}
+                        >Anfrage senden</Button>
+                        <ModalComponent isOpen={isOpen} onOpenChange={onOpenChange} modalContent={modalContent}/>
                     </div>
-                ))}
-            </CheckboxGroup>
-            <Button
-                name="submitButton"
-                id="submitButton"
-                variant="solid"
-                color="primary"
-                type="submit"
-                size="sm"
-            >Anfrage senden</Button>
-            <ModalComponent isOpen={isOpen} onOpenChange={onOpenChange} modalContent={modalContent}/>
+                </Fade>
+                : <LoadingProgressAnimation label={"Anfrage senden..."}/>
+            }
         </form>
     )
 }
