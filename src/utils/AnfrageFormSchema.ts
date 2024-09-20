@@ -21,8 +21,22 @@ export const AnfrageFormSchema = z.object({
         .lte(9999, 'Wert verlangt 4 Ziffern. '),
     city: z.string({invalid_type_error, required_error})
         .min(2, 'Wert verlangt mind. 2 Zeichen. '),
-    booking_from: z.optional(z.string()),
-    booking_to: z.optional(z.string()),
+    booking_from:
+        z.string().refine((val) => val === '', {
+            message: 'Datum nicht verfügbar',
+        }).or(z.coerce.date({
+            errorMap: (issue, {defaultError}) => ({
+                message: issue.code === "invalid_date" ? "Datum nicht verfügbar" : defaultError,
+            })
+        })),
+    booking_to:
+        z.string().refine((val) => val === '', {
+            message: 'Datum nicht verfügbar',
+        }).or(z.coerce.date({
+            errorMap: (issue, {defaultError}) => ({
+                message: issue.code === "invalid_date" ? "Datum nicht verfügbar" : defaultError,
+            })
+        })),
     remarks: z.optional(z.string()),
     regulations: z.string({invalid_type_error, required_error})
 })

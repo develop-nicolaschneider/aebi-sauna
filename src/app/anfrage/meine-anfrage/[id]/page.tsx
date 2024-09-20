@@ -6,7 +6,7 @@ import {BookingTable} from "@/components/BookingTable"
 import {useEffect, useState} from "react"
 import {Fade} from "react-awesome-reveal"
 import {Booking} from "@/types/Booking"
-import {LoadingAnimation} from "@/components/base/Loading";
+import {LoadingAnimation} from "@/components/base/Loading"
 
 type BookingRow = {
     key: string
@@ -84,23 +84,27 @@ const AnfragePage = ({params}: AnfragePageProps) => {
                             {
                                 key: '9',
                                 description: 'Gebucht von',
-                                value: ConvertToChDate(booking.booking_from?.toString())
+                                value: booking.booking_from !== '' ?
+                                    ConvertToChDate(booking.booking_from?.toString()) as string :
+                                    <span className="italic">Kein Datum gewählt</span>
                             },
                             {
                                 key: '10',
                                 description: 'Gebucht bis',
-                                value: ConvertToChDate(booking.booking_to?.toString())
+                                value: booking.booking_to !== '' ?
+                                    ConvertToChDate(booking.booking_to?.toString()) as string :
+                                    <span className="italic">Kein Datum gewählt</span>
                             },
                             {
                                 key: '11',
                                 description: 'Gebucht um',
                                 // value: ''
-                                value: ConvertToChDate(new Date(booking.booking_date).toString(), 'ld')
+                                value: ConvertToChDate(new Date(booking.booking_date).toString(), 'ld') as string
                             },
                             {
                                 key: '12',
                                 description: 'Bemerkungen',
-                                value: booking ? booking.remarks : ''
+                                value: booking.remarks ? booking.remarks : '-'
                             }
                         ]
                         setBookingRows(rows)

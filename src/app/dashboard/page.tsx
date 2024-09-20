@@ -115,30 +115,39 @@ const Dashboard = () => {
     })
 
     const filteredItems = React.useMemo(() => {
-        let filteredBookings = [...list.items]
-        if (hasSearchFilter) {
-            filteredBookings = filteredBookings.filter((booking) => {
-                    const name = booking.user !== null ? booking.user.firstName.toLowerCase() + ' ' + booking.user?.lastName.toLowerCase() : ''
-                    return name.includes(filterValue.toLowerCase())
-                }
-            )
+            let filteredBookings = [...list.items]
+            if (hasSearchFilter) {
+                filteredBookings = filteredBookings.filter((booking) => {
+                        const name = booking.user !== null ? booking.user.firstName.toLowerCase() + ' ' + booking.user?.lastName.toLowerCase() : ''
+                        return name.includes(filterValue.toLowerCase())
+                    }
+                )
+            }
+            if (statusFilter !== "all" && Array.from(statusFilter).length !== Object.entries(BookingState).length) {
+                filteredBookings = filteredBookings.filter((booking) => {
+                    return Array.from(statusFilter).includes(getKeyByValue(booking.booking_state))
+                })
+            }
+            if (dateFilter !== 'all' && Array.from(dateFilter).length !== Object.entries(BookingDateFilter).length) {
+                filteredBookings = filteredBookings.filter((booking) => {
+                    // Without Date
+                    if (booking.booking_from === '' || booking.booking_to === '') {
+                        return Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.WITHOUT_DATE))
+                    } else {
+                        // New Entries
+                        if (parseDate(booking.booking_to).compare(today(getLocalTimeZone())) >= 0)
+                            return Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.NEW_ENTRIES))
+                        // Old Entries
+                        if (parseDate(booking.booking_to).compare(today(getLocalTimeZone())) < 0)
+                            return Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.OLD_ENTRIES))
+                    }
+                })
+            }
+            return filteredBookings
         }
-        if (statusFilter !== "all" && Array.from(statusFilter).length !== Object.entries(BookingState).length) {
-            filteredBookings = filteredBookings.filter((booking) => {
-                return Array.from(statusFilter).includes(getKeyByValue(booking.booking_state))
-            })
-        }
-        if (dateFilter !== 'all' && Array.from(dateFilter).length !== Object.entries(BookingDateFilter).length) {
-            filteredBookings = filteredBookings.filter((booking) => {
-                if (Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.OLD_ENTRIES))) {
-                    return parseDate(booking.booking_to).compare(today(getLocalTimeZone())) < 0
-                } else if (Array.from(dateFilter).includes(getDateFilterKey(BookingDateFilter.NEW_ENTRIES))) {
-                    return parseDate(booking.booking_to).compare(today(getLocalTimeZone())) >= 0
-                }
-            })
-        }
-        return filteredBookings
-    }, [filterValue, hasSearchFilter, list.items, dateFilter, statusFilter])
+        ,
+        [filterValue, hasSearchFilter, list.items, dateFilter, statusFilter]
+    )
 
     const handleSelectChange = async (id: string, value: SharedSelection, booking: Booking) => {
         if (id && value.currentKey) {
@@ -296,6 +305,8 @@ const Dashboard = () => {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
+                                color="primary"
+                                variant="solid"
                                 disallowEmptySelection
                                 aria-label="Anfrage filtern"
                                 closeOnSelect={false}
@@ -317,6 +328,8 @@ const Dashboard = () => {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
+                                color="primary"
+                                variant="solid"
                                 id="statusDropdown"
                                 disallowEmptySelection
                                 aria-label="Buchung Status"
@@ -386,6 +399,7 @@ const Dashboard = () => {
                                     </PopoverTrigger>
                                     <PopoverContent>
                                         <div>
+                                            <span className="font-medium">{booking.id}</span><br/>
                                             {fullName}<br/>
                                             {user.phoneNumber}<br/>
                                             <Link
@@ -480,7 +494,7 @@ const Dashboard = () => {
                 className="mt-5"
                 aria-label="Buchungstabelle"
                 topContent={topContent}
-                bottomContent={bottomContent}
+                bottomContent={!loading && bottomContent}
                 sortDescriptor={list.sortDescriptor}
                 onSortChange={list.sort}>
                 <TableHeader columns={bookingColumns}>

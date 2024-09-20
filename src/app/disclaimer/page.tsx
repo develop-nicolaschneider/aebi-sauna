@@ -19,14 +19,14 @@ const Disclaimer = () => {
                     </h2>
                     <div className="max-w-lg text-xs sm:text-xs md:text-sm lg:text-base text-center">
                         <p>
-                            Der Schutz Deiner persönlichen Daten ist uns wichtig. Die von Dir über das Formular
+                            Der Schutz Deiner persönlichen Daten ist mir wichtig. Die von Dir über das Formular
                             bereitgestellten Informationen werden vertraulich behandelt und ausschließlich zur
-                            Bearbeitung Deiner Anfrage verwendet. Wir speichern diese Daten in der Cloud-Datenbank
+                            Bearbeitung Deiner Anfrage verwendet. Ich speichere diese Daten in der Cloud-Datenbank
                             Google Firestore. Google Firestore ist ein Dienst, der den Datenschutzrichtlinien von Google
                             unterliegt und eine sichere Speicherung Deiner Daten gewährleistet.<br/>
                             Es werden keine persönlichen Daten ohne Deine ausdrückliche Zustimmung an Dritte
                             weitergegeben. Du hast jederzeit das Recht, Auskunft über die von Dir gespeicherten Daten zu
-                            erhalten und deren Löschung zu verlangen. Bei Fragen zum Datenschutz kannst Du uns jederzeit
+                            erhalten und deren Löschung zu verlangen. Bei Fragen zum Datenschutz kannst Du mich jederzeit
                             kontaktieren.
                         </p>
                     </div>

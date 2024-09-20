@@ -41,12 +41,13 @@ function getKeyByValue(value: 'AUSSTEHEND' | 'BESTÄTIGT' | 'ABGELEHNT' | 'UNBEK
     return BookingState.UNKNOWN
 }
 
-const BookingDateFilter: Record<string, 'ALTE EINTRÄGE' | 'NEUE EINTRÄGE'>  = {
+const BookingDateFilter: Record<string, 'ALTE EINTRÄGE' | 'NEUE EINTRÄGE' | 'OHNE DATUM'>  = {
     OLD_ENTRIES: 'ALTE EINTRÄGE',
     NEW_ENTRIES: 'NEUE EINTRÄGE',
+    WITHOUT_DATE: 'OHNE DATUM',
 }
 
-function getDateFilterKey(value: 'ALTE EINTRÄGE' | 'NEUE EINTRÄGE' | string): string {
+function getDateFilterKey(value: 'ALTE EINTRÄGE' | 'NEUE EINTRÄGE' | 'OHNE DATUM' | string): string {
     const key = Object.keys(BookingDateFilter).find((key) => BookingDateFilter[key] === value)
     if (key)
         return key

@@ -18,13 +18,13 @@ const Dampfwage = () => {
         },
         {
             key: 'card-2',
-            img: [dampfwageInside],
+            img: [dampfwageInside, dampfwageInside],
             title: "Bau",
             description: "Die Sauna wurde komplett selbst gebaut aus massivem Holz. Der Eckbank bietet Platz für ca. 4- max. 6 Personen.",
         },
         {
             key: 'card-3',
-            img: [dampfwageOutside],
+            img: [dampfwageOutside, dampfwageOutside],
             title: "Resultat",
             description: "Das Treppchen zur puren Entspannung! Der geräumige Vorraum kann zum Umziehen und als Ablage genutzt werden. Durch die Glastüre geht’s dann direkt in die heisse Schwitzstube."
         }

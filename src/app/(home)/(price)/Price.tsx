@@ -87,14 +87,14 @@ const Price = () => {
                     <PriceAccordion items={accordionPrices} title="Mietpreise"/>
                     <PriceAccordion items={accordionSpecials} title="Zusätzliche Kosten"/>
                 </Fade>
-                <small className="col-span-1 lg:col-span-2 text-zinc-600 text-center leading-4">
+                <small className="text-xs sm:text-xs md:text-sm lg:text-base col-span-1 leading-4 lg:col-span-2 text-zinc-600 text-center">
                     Beachte bitte die
                     <Link
                         isExternal
                         href="/files/Nutzungsbedingungen.pdf"
                         target="_blank"
                         as={NextLink}
-                        className="text-xs sm:text-xs md:text-sm lg:text-base">
+                        className="text-xs sm:text-xs md:text-sm lg:text-base leading-4">
                         &nbsp;Nutzungsbedingungen&nbsp;
                     </Link>
                     für die Miete und Nutzung der mobilen Sauna!

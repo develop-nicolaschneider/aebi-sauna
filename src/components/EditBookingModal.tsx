@@ -7,7 +7,7 @@ import {
     ModalFooter,
     Button,
     Input,
-    RangeCalendar, DateValue, Textarea
+    RangeCalendar, DateValue, Textarea, Switch
 } from "@nextui-org/react"
 import {getBookings, updateBooking} from "@/utils/firebase"
 import {CalendarDate, getLocalTimeZone, parseDate, today} from "@internationalized/date"
@@ -27,8 +27,9 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
     const onCloseRef = useRef(() => {
         return
     })
-    const start = booking ? parseDate(booking.booking_from) : today(getLocalTimeZone())
-    const end = booking ? parseDate(booking.booking_to) : today(getLocalTimeZone())
+    const [isDateSelected, setIsDateSelected] = React.useState(false)
+    const start = booking && booking.booking_from !== '' ? parseDate(booking.booking_from) : today(getLocalTimeZone())
+    const end = booking && booking.booking_to !== '' ? parseDate(booking.booking_to) : today(getLocalTimeZone())
     const [selectedRange, setSelectedRange] = useState(
         {start: start, end: end}
     )
@@ -36,9 +37,13 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
     const disabledRanges = bookingList?.map(bookingItem => {
         if (bookingItem !== null) {
             if (bookingItem.booking_from !== '' && bookingItem.booking_to !== '') {
-                return ([
-                    parseDate(bookingItem.booking_from), parseDate(bookingItem.booking_to)
-                ])
+                if (booking !== undefined) {
+                    if (bookingItem.booking_from !== booking.booking_from && bookingItem.booking_to !== booking.booking_to) {
+                        return ([
+                            parseDate(bookingItem.booking_from), parseDate(bookingItem.booking_to)
+                        ])
+                    }
+                }
             }
         }
     })
@@ -53,7 +58,7 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
             )
         }
         return false
-    }, [])
+    }, [disabledRanges])
     const [errors, setErrors] = useState<any>({})
     const user = booking?.user
     const inputFields = [
@@ -115,23 +120,51 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
         },
     ]
 
+    function isDateFromBookingsUnavailable(bookings: Booking[], date: DateValue) {
+        console.log(bookings, date)
+        if (bookings.length > 0) {
+            return bookings.some(
+                (bookingItem) => {
+                    if (bookingItem.booking_from !== '' && bookingItem.booking_to !== '') {
+                        if (booking !== undefined) {
+                            console.log('booking', booking.booking_to, bookingItem.booking_to)
+                            if (booking.booking_to === bookingItem.booking_to) {
+                                return false
+                            } if (booking.booking_from === bookingItem.booking_from) {
+                                return false
+                            }
+                        }
+                        return date.compare(parseDate(bookingItem.booking_from)) >= 0 && date.compare(parseDate(bookingItem.booking_to)) <= 0
+                    }
+                    return false
+                }
+            )
+        }
+        return false
+    }
+
     const handleSave = async (e: { preventDefault: () => void; currentTarget: HTMLFormElement | undefined }) => {
         e.preventDefault()
         const data = Object.fromEntries(new FormData(e.currentTarget))
         const checkBookings = await getBookings()
-        data['booking_from'] = selectedRange.start.toString()
-        data['booking_to'] = selectedRange.end.toString()
+        data['booking_from'] = isDateSelected ? selectedRange.start.toString() : ''
+        data['booking_to'] = isDateSelected ? selectedRange.end.toString() : ''
         data['regulations'] = ''
-        if (isDateUnavailable(parseDate(data.booking_from as string))) {
-            data.booking_from = ''
-        }
-        if (isDateUnavailable(parseDate(data.booking_to as string))) {
-            data.booking_to = ''
-        }
         data['id'] = booking ? booking.id : ''
+        if (checkBookings !== null) {
+            if (selectedRange.start.toString() !== '' && selectedRange.end.toString() !== '') {
+                if (isDateFromBookingsUnavailable(checkBookings, selectedRange.start)) {
+                    data.booking_from = 'error'
+                }
+                if (isDateFromBookingsUnavailable(checkBookings, selectedRange.start)) {
+                    data.booking_to = 'error'
+                }
+            }
+        }
         const result = AnfrageFormSchema.safeParse(data)
         if (!result.success) {
             setErrors(result.error.flatten())
+            setFocusedDate(selectedRange?.start ? selectedRange?.start : today(getLocalTimeZone()))
             return
         }
         const response = await updateBooking(data)
@@ -152,11 +185,13 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
 
     useEffect(() => {
         if (booking) {
-            setSelectedRange({
-                start: parseDate(booking.booking_from),
-                end: parseDate(booking.booking_to)
-            })
-            setFocusedDate(parseDate(booking.booking_to))
+            const range =  {
+                start: booking.booking_from !== '' ? parseDate(booking.booking_from) : today(getLocalTimeZone()),
+                end: booking.booking_to !== '' ? parseDate(booking.booking_to) : today(getLocalTimeZone())
+            }
+            setSelectedRange(range)
+            setFocusedDate(range.start)
+            setIsDateSelected(booking.booking_from !== '' && booking.booking_to !== '' )
         }
     }, [booking])
 
@@ -221,18 +256,26 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
                                         prevButton: styles.prevButton,
                                         nextButton: styles.nextButton
                                     }}
+                                    isDisabled={!isDateSelected}
                                     calendarWidth={320}
                                     value={selectedRange}
                                     onChange={handleDateChange}
                                     isDateUnavailable={isDateUnavailable}
-                                    errorMessage="Datum nicht verfügbar"
+                                    isInvalid={!!errors.fieldErrors?.['booking_from']}
+                                    errorMessage={errors?.fieldErrors?.['booking_from'] !== undefined ? errors?.fieldErrors?.['booking_from'] :
+                                        (selectedRange?.start.toString() === today(getLocalTimeZone()).toString() ?
+                                            ' ' : 'Datum nicht verfügbar.')
+                                    }
                                     autoFocus={false}
                                     focusedValue={focusedDate}
                                     onFocusChange={setFocusedDate}
                                     pageBehavior="single"
                                     weekdayStyle="short"
                                 />
-                                <span className="text-default-400 text-xs">
+                                <Switch size="sm" isSelected={isDateSelected} onValueChange={setIsDateSelected}>
+                                    Wunschdatum wählen
+                                </Switch>
+                                <span className="text-default-400 text-xs text-center">
                                     Beim Ändern von Personendaten werden alle Daten angepasst, welche unter dieser Email abgespeichert wurden.
                                 </span>
                             </ModalBody>

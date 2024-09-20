@@ -35,10 +35,10 @@ export default function Anfrage() {
     const searchParams = useSearchParams()
     const maxBookingDate: DateDuration = {days: 365}
     const maxBookingDuration: DateDuration = {days: 14}
-    const maxBookingDurationMessage = `Max. Buchungsdauer: ${Number(maxBookingDuration.days)} Tage. Längere Buchungsdauer bitte in den Bemerkungen angeben.`
+    const maxBookingDurationMessage = `Max. Buchungsdauer: ${Number(maxBookingDuration.days)} Tage.`
     const {isOpen, onOpen, onOpenChange} = useDisclosure()
     const [loading, setLoading] = useState<boolean>(false)
-    const [isSelected, setIsSelected] = React.useState(false)
+    const [isDateSelected, setIsDateSelected] = React.useState(false)
     const [regulationsAgreed, setRegulationsAgreed] = useState(false)
     const [modalContent, setModalContent] = useState({
         title: '',
@@ -80,6 +80,9 @@ export default function Anfrage() {
 
     function isDateFromBookingsUnavailable(bookings: Booking[], date: DateValue) {
         console.log(bookings, date)
+        if (date.compare(today(getLocalTimeZone())) === 0) {
+            return true
+        }
         if (bookings.length > 0) {
             return bookings.some(
                 (booking) => {
@@ -215,18 +218,20 @@ export default function Anfrage() {
         e.preventDefault()
         const data = Object.fromEntries(new FormData(e.currentTarget))
         const checkBookings = await getBookings()
-        data['booking_from'] = isSelected ? selectedRange.start.toString() : ''
-        data['booking_to'] = isSelected ? selectedRange.end.toString() : ''
-        console.log(data)
+        data['booking_from'] = isDateSelected ? selectedRange.start.toString() : ''
+        data['booking_to'] = isDateSelected ? selectedRange.end.toString() : ''
 
-        if (checkBookings !== null) {
+        if (isDateSelected && checkBookings !== null) {
             setBookings(checkBookings)
-            if (selectedRange.start.toString() !== '' && selectedRange.end.toString() !== '') {
+            if (isInvalid) {
+                data.booking_from = 'error'
+                data.booking_to = 'error'
+            } else if (selectedRange.start.toString() !== '' && selectedRange.end.toString() !== '') {
                 if (isDateFromBookingsUnavailable(checkBookings, selectedRange.start)) {
-                    data.booking_from = ''
+                    data.booking_from = 'error'
                 }
                 if (isDateFromBookingsUnavailable(checkBookings, selectedRange.start)) {
-                    data.booking_to = ''
+                    data.booking_to = 'error'
                 }
             }
         }
@@ -241,31 +246,31 @@ export default function Anfrage() {
         const formCheckRows = [
             {
                 description: 'Email',
-                value: data ? data.email.toString() as string : ''
+                value: data ? data.email.toString() : ''
             },
             {
                 description: 'Telefonnummer',
-                value: data ? data.phoneNumber.toString() as string : ''
+                value: data ? data.phoneNumber.toString() : ''
             },
             {
                 description: 'Vorname',
-                value: data ? data.firstName.toString() as string : '',
+                value: data ? data.firstName.toString() : '',
             },
             {
                 description: 'Nachname',
-                value: data ? data.lastName.toString() as string : ''
+                value: data ? data.lastName.toString() : ''
             },
             {
                 description: 'Strasse',
-                value: data ? data.street.toString() as string : ''
+                value: data ? data.street.toString() : ''
             },
             {
                 description: 'Postleitzahl',
-                value: data ? data.postalCode.toString() as string : ''
+                value: data ? data.postalCode.toString() : ''
             },
             {
                 description: 'Ort',
-                value: data ? data.city.toString() as string : ''
+                value: data ? data.city.toString() : ''
             },
             {
                 description: 'Datum von',
@@ -328,6 +333,8 @@ export default function Anfrage() {
         } else if (response.type === 'success') {
             setErrors({})
             const booking = response.booking
+            console.log(Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS))
+            console.log('sendEmail', (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && booking.user !== null), Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS), booking.user !== null)
             if (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && booking.user !== null) {
                 const res = await fetch('api/sendEmail', {
                     method: 'POST',
@@ -437,9 +444,9 @@ export default function Anfrage() {
                                 showArrow
                                 color="primary"
                                 closeDelay={0}
-                                content="Wunschdatum optional wählen">
+                                content="Datum optional">
                                 <RangeCalendar
-                                    isDisabled={!isSelected}
+                                    isDisabled={!isDateSelected}
                                     id="calendar"
                                     className="col-start-1 md:col-start-2"
                                     classNames={{
@@ -454,9 +461,12 @@ export default function Anfrage() {
                                     minValue={minValue.add({days: 1})}
                                     maxValue={maxValue}
                                     isDateUnavailable={isDateUnavailable}
-                                    isInvalid={isInvalid}
+                                    isInvalid={isInvalid || !!errors.fieldErrors?.['booking_from']}
                                     errorMessage={isInvalid ? maxBookingDurationMessage :
-                                        (selectedRange?.start.toString() === today(getLocalTimeZone()).toString() ? ' ' : 'Datum nicht verfügbar.')}
+                                        errors?.fieldErrors?.['booking_from'] !== undefined ? errors?.fieldErrors?.['booking_from'] :
+                                            (selectedRange?.start.toString() === today(getLocalTimeZone()).toString() ?
+                                                ' ' : 'Datum nicht verfügbar.')
+                                    }
                                     onChange={handleDateChange}
                                     focusedValue={focusedDate}
                                     onFocusChange={setFocusedDate}
@@ -464,11 +474,12 @@ export default function Anfrage() {
                                     weekdayStyle="short"
                                 />
                             </Tooltip>
-                            <Switch size="sm" isSelected={isSelected} onValueChange={setIsSelected}>
+                            <Switch size="sm" isSelected={isDateSelected} onValueChange={setIsDateSelected}>
                                 Wunschdatum wählen
                             </Switch>
-                            <small className="text-center leading-5">
-                                Wochenendanfragen nur Sa+So möglich.
+                            <small className="text-center text-zinc-400 leading-5 max-w-sm">
+                                Wochenendanfragen nur Sa+So möglich.<br/>
+                                Längere Buchungsdauer in den Bemerkungen erwähnen.
                             </small>
                         </div>
                         <div className="text-center h-full self-center leading-5">

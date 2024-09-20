@@ -12,7 +12,7 @@ import {
     Tooltip
 } from "@nextui-org/react"
 import {BookingStateColor, BookingStateStatus, getKeyByValue} from "@/types/BookingState"
-import React from "react";
+import React from "react"
 
 type BookingTableProps = {
     rows: { description: string, value: string }[]
