@@ -1,9 +1,10 @@
 'use client'
 
-import {Button, Input} from "@nextui-org/react"
+import {Button, Input, Checkbox, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react"
 import {useState} from 'react'
 import {LoginFormSchema} from "@/utils/LoginFormSchema"
-import {login} from "@/utils/firebase";
+import {signIn} from "@/utils/firebaseAuth"
+import {createSession} from "@/utils/session"
 
 const Login = () => {
     const [errors, setErrors] = useState<any>({})
@@ -37,46 +38,63 @@ const Login = () => {
             setSubmitting(false)
             return
         }
-        const response = await login(data)
-        if (response) {
-            result = LoginFormSchema.safeParse({email: 0, password: 0})
-            if (!result.success) {
-                setErrors(result.error.flatten())
-                setSubmitting(false)
-                return
+        try {
+            const userUid = await signIn(result.data)
+            if (userUid !== undefined) {
+                const token = userUid.uid
+                await createSession(token, result.data.rememberMe)
             }
+        } catch (error: any) {
+            console.error(error.message);
         }
         setErrors({})
         setSubmitting(false)
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                {loginFields.map(({name, label, placeholder, title, type, autoComplete}) => (
-                    <Input
-                        name={name}
-                        id={name}
-                        key={name}
-                        label={label}
-                        placeholder={placeholder}
-                        title={title}
-                        type={type}
-                        autoComplete={autoComplete}
-                        isInvalid={!!errors?.fieldErrors?.[name]}
-                        errorMessage={errors?.fieldErrors?.[name]}
-                        variant="flat"
-                        size="sm"
-                    />
-                ))}
-                <Button
-                    type="submit"
-                    variant="solid"
-                    color="primary"
-                    disabled={submitting}
-                >{submitting ? 'Login...' : 'Login'}</Button>
-            </form>
-        </div>
+        <form onSubmit={handleSubmit} className="grid justify-items-center">
+            <Card className="grid grid-cols-1 justify-items-center my-12 pt-3 w-full max-w-sm">
+                <CardHeader>
+                    <p className="text-lg">Login</p>
+                </CardHeader>
+                <CardBody className="grid grid-cols-1 gap-y-2">
+                    {loginFields.map(({name, label, placeholder, title, type, autoComplete}) => (
+                        <Input
+                            name={name}
+                            id={name}
+                            key={name}
+                            label={label}
+                            placeholder={placeholder}
+                            title={title}
+                            type={type}
+                            autoComplete={autoComplete}
+                            isInvalid={!!errors?.fieldErrors?.[name]}
+                            errorMessage={errors?.fieldErrors?.[name]}
+                            variant="underlined"
+                            size="sm"
+                        />
+                    ))}
+                </CardBody>
+                <CardFooter className="flex flex-row justify-between">
+                    <Checkbox
+                        name="rememberMe"
+                        className="w-fit"
+                        size="sm">
+                        Login merken
+                    </Checkbox>
+                    <Button
+                        className="w-fit"
+                        type="submit"
+                        variant="solid"
+                        color="primary"
+                        disabled={submitting}
+                        size="md"
+                    >
+                        {submitting ? 'Login...' : 'Login'}
+                    </Button>
+                </CardFooter>
+            </Card>
+        </form>
     )
 }
 

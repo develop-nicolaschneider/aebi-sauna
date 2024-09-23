@@ -1,23 +1,22 @@
-import {NextResponse} from "next/server"
+import {NextRequest, NextResponse} from "next/server"
 import nodemailer from 'nodemailer'
 import SMTPTransport from "nodemailer/lib/smtp-transport"
-import {Booking} from "@/utils/firebase"
-import ConfirmationEmailTemplate from "@/app/api/sendEmail/ConfirmationEmailTemplate"
+import {Booking} from "@/types/Booking"
+import RequestSentEmailTemplate from "@/app/api/sendEmail/RequestSentEmailTemplate"
+import React from "react"
 
-export async function POST(req: {
-    json: () => PromiseLike<{ email: string; subject: string; booking: Booking }> | {
-        email: string
-        subject: string
-        booking: Booking
-    }
-}) {
+type EmailProps = {
+    email: string,
+    subject: string,
+    booking: Booking,
+}
+
+export async function POST(req: NextRequest) {
     try {
-        const {email, subject, booking} = await req.json()
-        console.log(email)
-        console.log(subject)
-        console.log({booking})
-        const { renderToStaticMarkup } = await import( "react-dom/server" )
-        const emailContent = renderToStaticMarkup( <ConfirmationEmailTemplate booking={booking}/> )
+        const {email, subject, booking}: EmailProps = await req.json()
+        const {renderToStaticMarkup} = await import( "react-dom/server" )
+        const imageSrc = `${req.nextUrl.origin}/images/icons/dampfwage-quadrat.svg`
+        const emailContent = renderToStaticMarkup(<RequestSentEmailTemplate booking={booking} imageSrc={imageSrc}/>)
         const transporter = nodemailer.createTransport({
             host: process.env.GMAIL_HOST,
             port: Number(process.env.GMAIL_PORT),
@@ -27,13 +26,14 @@ export async function POST(req: {
                 pass: process.env.GMAIL_APP_PASSWORD,
             },
         } as SMTPTransport.Options)
-        const mailOptions: nodemailer.SendMailOptions = {
-            from: `"Dampfwage" <${process.env.GMAIL_USER}>`,
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
             to: email,
             subject: subject,
-            html: emailContent
+            html: emailContent,
         }
-        console.log('sendEmail', mailOptions)
+
         await transporter.sendMail(mailOptions)
         return NextResponse.json(
             {message: 'Email sent successfully!'},

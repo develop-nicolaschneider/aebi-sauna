@@ -21,17 +21,22 @@ export const AnfrageFormSchema = z.object({
         .lte(9999, 'Wert verlangt 4 Ziffern. '),
     city: z.string({invalid_type_error, required_error})
         .min(2, 'Wert verlangt mind. 2 Zeichen. '),
-    booking_from: z.coerce.date({
-        errorMap: (issue, {defaultError}) => ({
-            message: issue.code === "invalid_date" ? "Ungültiges Datum" : defaultError,
-        })
-    }),
-    booking_to: z.coerce.date({
-        errorMap: (issue, {defaultError}) => ({
-            message: issue.code === "invalid_date" ? "Ungültiges Datum" : defaultError,
-        })
-    }),
-    agbRegulations: z.string({invalid_type_error, required_error}),
-    dataRegulations: z.string({invalid_type_error, required_error}),
-    usageRegulations: z.string({invalid_type_error, required_error}),
+    booking_from:
+        z.string().refine((val) => val === '', {
+            message: 'Datum nicht verfügbar',
+        }).or(z.coerce.date({
+            errorMap: (issue, {defaultError}) => ({
+                message: issue.code === "invalid_date" ? "Datum nicht verfügbar" : defaultError,
+            })
+        })),
+    booking_to:
+        z.string().refine((val) => val === '', {
+            message: 'Datum nicht verfügbar',
+        }).or(z.coerce.date({
+            errorMap: (issue, {defaultError}) => ({
+                message: issue.code === "invalid_date" ? "Datum nicht verfügbar" : defaultError,
+            })
+        })),
+    remarks: z.optional(z.string()),
+    regulations: z.string({invalid_type_error, required_error})
 })
