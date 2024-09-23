@@ -22,7 +22,7 @@ interface ValidationError {
         booking_to: Date,
         regulations: string,
         remarks?: string | undefined
-    }, string>
+    }>
 }
 
 interface ServerError {

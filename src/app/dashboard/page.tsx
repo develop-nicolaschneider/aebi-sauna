@@ -46,6 +46,7 @@ import CommentIcon from '@mui/icons-material/Comment'
 import {BookingUser} from "@/types/BookingUser"
 import {Link} from "@nextui-org/link"
 import {Loading, LoadingAnimation} from "@/components/base/Loading"
+import EmailModal from "@/app/dashboard/EmailModal"
 
 const bookingColumns = [
     {key: "user", label: "Kontakt"},
@@ -65,6 +66,8 @@ const Dashboard = () => {
     const [, setSelectedState] = useState<SharedSelection>(new Set([]))
     const {isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange} = useDisclosure()
     const {isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange} = useDisclosure()
+    const {isOpen: isEmailOpen, onOpen: onEmailOpen, onOpenChange: onEmailOpenChange} = useDisclosure()
+    const [stateBooking, setStateBooking] = useState<Booking>()
     const [editBooking, setEditBooking] = useState<Booking>()
     const [modalContent, setModalContent] = useState({
         title: "",
@@ -73,6 +76,7 @@ const Dashboard = () => {
         actionText: "",
         content: <Fragment/>,
     })
+    const [stateError, setStateError] = useState({id: '', message: ''})
 
     let list = useAsyncList<Booking>({
         async load() {
@@ -149,33 +153,46 @@ const Dashboard = () => {
         [filterValue, hasSearchFilter, list.items, dateFilter, statusFilter]
     )
 
-    const handleSelectChange = async (id: string, value: SharedSelection, booking: Booking) => {
-        if (id && value.currentKey) {
+    const handleStateChange = async (emailModalData: { message: string }) => {
+        if (stateBooking !== undefined) {
             try {
-                await updateBookingState(id, BookingState[value.currentKey]).then()
-                // ToDo Email temp for BookingState CONFIRMED
+                // const pdfStream = await renderToStream(<AgreementPdf booking={stateBooking} emailData={emailModalData} />)
+                const res = await fetch('api/sendEmail', {
+                    method: 'POST',
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({
+                        email: stateBooking?.user?.id,
+                        subject: 'Anfrage bestätigt & Mietvertrag',
+                        booking: stateBooking,
+                        emailModalData: emailModalData,
+                    })
+                })
+                await res.json()
+                if (!res.ok) {
+                    console.error(res)
+                }
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    }
 
-                // if (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && BookingState.CONFIRMED === BookingState[value.currentKey]) {
-                //     try {
-                //         const res = await fetch('api/sendEmail', {
-                //             method: 'POST',
-                //             headers: {'content-type': 'application/json'},
-                //             body: JSON.stringify({
-                //                 email: booking?.user?.id,
-                //                 subject: 'Buchungsbestätigung',
-                //                 booking: booking
-                //             })
-                //         })
-                //         await res.json()
-                //         if (res.ok) {
-                //             console.log(res)
-                //         } else {
-                //             console.error(res)
-                //         }
-                //     } catch (error) {
-                //         console.error(error)
-                //     }
-                // }
+    const handleSelectChange = async (id: string, value: SharedSelection, booking: Booking) => {
+        if (id && value.currentKey && booking.booking_state !== value.currentKey) {
+            try {
+                if (BookingState.CONFIRMED === BookingState[value.currentKey]) {
+                    if (booking.booking_from !== '' && booking.booking_to !== '') {
+                        setStateError({id: '', message: ''})
+                        await updateBookingState(id, BookingState[value.currentKey]).then()
+                        setStateBooking(booking)
+                        // onEmailOpen()
+                    } else {
+                        setStateError({id: booking.id, message: 'Daten Invalid'})
+                    }
+                } else {
+                    setStateError({id: '', message: ''})
+                    await updateBookingState(id, BookingState[value.currentKey]).then()
+                }
                 list.reload()
             } catch (error) {
                 console.error(error)
@@ -430,28 +447,34 @@ const Dashboard = () => {
             case 'booking_state':
                 return (
                     <Select
+                        isInvalid={booking.id === stateError.id && stateError.message !== ''}
+                        errorMessage={stateError.message}
                         name="bookingStatus"
                         aria-label="Buchungsstatus wählen"
                         className={"min-w-44 max-w-min"}
                         items={Object.entries(BookingState)}
                         size="sm"
                         radius="full"
-                        defaultSelectedKeys={booking ? [getKeyByValue(booking.booking_state)] : []}
+                        selectedKeys={booking ? [getKeyByValue(booking.booking_state)] : []}
                         onSelectionChange={selection => {
-                            setSelectedState(selection)
-                            handleSelectChange(booking.id, selection, booking).then()
+                            if (selection.currentKey !== undefined) {
+                                setSelectedState(selection)
+                                handleSelectChange(booking.id, selection, booking).then()
+                            }
                         }}
                         renderValue={(items) => {
                             return (
-                                <div>
+                                <>
                                     {items.map((item) => (
                                         <Chip
                                             id={`chip-${item.key}`}
                                             className={"min-w-32 max-w-min text-center"}
                                             color={item.textValue ? getColorByValue(item.textValue) : 'default'}
-                                            key={item.key}>{item.textValue}</Chip>
+                                            key={item.key}>
+                                            {item.textValue}
+                                        </Chip>
                                     ))}
-                                </div>
+                                </>
                             )
                         }}
                     >
@@ -530,6 +553,8 @@ const Dashboard = () => {
                     handleEditReload={handleEditReload}
                 />
             )}
+            <EmailModal isOpen={isEmailOpen} onOpenChange={onEmailOpenChange} stateChange={handleStateChange}/>
+
             <ModalComponent
                 isOpen={isDeleteOpen}
                 onOpenChange={onDeleteOpenChange}

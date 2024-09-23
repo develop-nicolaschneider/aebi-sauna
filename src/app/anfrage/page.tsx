@@ -29,6 +29,13 @@ import {LoadingProgressAnimation} from "@/components/base/Loading"
 import Disclaimer from "@/app/disclaimer/page"
 import UsageRegulations from "@/components/UsageRegulations"
 
+type ModalContent = {
+    title?: string
+    handleAction: () => void
+    actionText: string
+    content: React.JSX.Element
+}
+
 export default function Anfrage() {
     const router = useRouter()
     const pathname = usePathname()
@@ -40,7 +47,7 @@ export default function Anfrage() {
     const [loading, setLoading] = useState<boolean>(false)
     const [isDateSelected, setIsDateSelected] = React.useState(false)
     const [regulationsAgreed, setRegulationsAgreed] = useState(false)
-    const [modalContent, setModalContent] = useState({
+    const [modalContent, setModalContent] = useState<ModalContent>({
         title: '',
         handleAction: () => {
         },
@@ -64,6 +71,7 @@ export default function Anfrage() {
                 ])
             }
         }
+        return ([today(getLocalTimeZone()), today(getLocalTimeZone())])
     })
     const isDateUnavailable = useCallback((date: DateValue) => {
         if (disabledRanges !== undefined) {
@@ -79,7 +87,6 @@ export default function Anfrage() {
     }, [disabledRanges])
 
     function isDateFromBookingsUnavailable(bookings: Booking[], date: DateValue) {
-        console.log(bookings, date)
         if (date.compare(today(getLocalTimeZone())) === 0) {
             return true
         }
@@ -132,7 +139,7 @@ export default function Anfrage() {
         {
             name: 'email',
             label: 'Email',
-            placeholder: 'email@email.ch',
+            placeholder: 'deine@email.ch',
             title: 'Email',
             type: 'email',
             autoComplete: 'email'
@@ -177,7 +184,6 @@ export default function Anfrage() {
             name: "dataRegulations",
             text: "Datenschutzbestimmungen",
             modalContent: {
-                title: "Datenschutzerklärungen",
                 handleAction: () => handleModalAction(true),
                 actionText: "Akzeptieren",
                 content: <DataProtectionComponent/>,
@@ -199,14 +205,10 @@ export default function Anfrage() {
         // check if start or end is weekend
         let correctedRange = range
         if (isWeekend(range.start, 'de-CH') || isWeekend(range.end, 'de-CH')) {
-            console.log('isWeekend', range)
-            console.log(getDayOfWeek(range.start, 'de-CH'), getDayOfWeek(range.end, 'de-CH'))
             if (getDayOfWeek(range.start, 'de-CH') === 6) {
-                console.log('start === sunday')
                 correctedRange = {start: range.start.add({days: -1}), end: range.end}
             }
             if (getDayOfWeek(range.end, 'de-CH') === 5) {
-                console.log('end === saturday')
                 correctedRange = {start: range.start, end: range.end.add({days: 1})}
             }
         }
@@ -236,7 +238,6 @@ export default function Anfrage() {
             }
         }
         const result = AnfrageFormSchema.safeParse(data)
-        console.log(result)
         if (!result.success) {
             setErrors(result.error.flatten())
             setFocusedDate(selectedRange?.start ? selectedRange?.start : minValue)
@@ -305,12 +306,7 @@ export default function Anfrage() {
         handleModalOpen(formCheckModal)
     }
 
-    const handleModalOpen = (modalContent: {
-        title: string,
-        handleAction: () => void,
-        actionText: string,
-        content: React.JSX.Element
-    }) => {
+    const handleModalOpen = (modalContent: ModalContent) => {
         setModalContent(modalContent)
         onOpen()
     }
@@ -333,8 +329,6 @@ export default function Anfrage() {
         } else if (response.type === 'success') {
             setErrors({})
             const booking = response.booking
-            console.log(Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS))
-            console.log('sendEmail', (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && booking.user !== null), Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS), booking.user !== null)
             if (Boolean(process.env.NEXT_PUBLIC_SEND_EMAILS) && booking.user !== null) {
                 const res = await fetch('api/sendEmail', {
                     method: 'POST',

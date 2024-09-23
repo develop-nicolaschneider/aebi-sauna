@@ -1,11 +1,14 @@
+'use server'
+
 import {Booking} from "@/types/Booking"
 import convertToChDate from "@/utils/ConvertToChDate"
 
 type ConfirmationEmailTemplateProps = {
     booking: Booking
+    imageSrc: string
 }
 
-const ConfirmationEmailTemplate = ({booking}: ConfirmationEmailTemplateProps) => (
+const RequestSentEmailTemplate = ({booking, imageSrc}: ConfirmationEmailTemplateProps) => (
     <html lang="de">
     <head>
         <meta charSet="UTF-8"/>
@@ -53,12 +56,17 @@ const ConfirmationEmailTemplate = ({booking}: ConfirmationEmailTemplateProps) =>
                 font-size: 12px;
                 color: #777;
             }
+            .preLine {
+                white-space: pre-line;
+            }
         `}</style>
     </head>
     <body>
     <div className="container">
         <div className="header">
             <h1>Anfrage Dampfwage</h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img alt="dampfwage-logo" src={imageSrc} height={60} width={60}/>
         </div>
         <div className="content">
             <h2>
@@ -75,10 +83,17 @@ const ConfirmationEmailTemplate = ({booking}: ConfirmationEmailTemplateProps) =>
                 <li>
                     <strong>Buchungsnummer:</strong> {booking.id}
                 </li>
-                <li>
-                    <strong>Anfrage vom:</strong>
-                    &nbsp;{convertToChDate(booking.booking_from)} bis {convertToChDate(booking.booking_to)}
-                </li>
+                {booking.booking_from !== '' &&
+                    <li>
+                        <strong>Anfrage vom:</strong>
+                        &nbsp;{convertToChDate(booking.booking_from)} bis {convertToChDate(booking.booking_to)}
+                    </li>
+                }
+                {booking.remarks && booking.remarks !== '' &&
+                    <li className="preLine">
+                        <strong>Bemerkungen:</strong> {booking.remarks}
+                    </li>
+                }
             </ul>
             <p>Falls Du noch Fragen hast, zögere nicht mich zu kontaktieren.</p>
             <p className="noMarginBottom">Beste Grüßen</p>
@@ -92,4 +107,4 @@ const ConfirmationEmailTemplate = ({booking}: ConfirmationEmailTemplateProps) =>
     </html>
 )
 
-export default ConfirmationEmailTemplate
+export default RequestSentEmailTemplate

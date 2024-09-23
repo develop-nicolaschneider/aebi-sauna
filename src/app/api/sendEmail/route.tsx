@@ -2,13 +2,21 @@ import {NextRequest, NextResponse} from "next/server"
 import nodemailer from 'nodemailer'
 import SMTPTransport from "nodemailer/lib/smtp-transport"
 import {Booking} from "@/types/Booking"
-import ConfirmationEmailTemplate from "@/app/api/sendEmail/ConfirmationEmailTemplate"
+import RequestSentEmailTemplate from "@/app/api/sendEmail/RequestSentEmailTemplate"
+import React from "react"
+
+type EmailProps = {
+    email: string,
+    subject: string,
+    booking: Booking,
+}
 
 export async function POST(req: NextRequest) {
     try {
-        const { email, subject, booking }: { email: string; subject: string; booking: Booking } = await req.json();
-        const { renderToStaticMarkup } = await import( "react-dom/server" )
-        const emailContent = renderToStaticMarkup( <ConfirmationEmailTemplate booking={booking}/> )
+        const {email, subject, booking}: EmailProps = await req.json()
+        const {renderToStaticMarkup} = await import( "react-dom/server" )
+        const imageSrc = `${req.nextUrl.origin}/images/icons/dampfwage-quadrat.svg`
+        const emailContent = renderToStaticMarkup(<RequestSentEmailTemplate booking={booking} imageSrc={imageSrc}/>)
         const transporter = nodemailer.createTransport({
             host: process.env.GMAIL_HOST,
             port: Number(process.env.GMAIL_PORT),
@@ -18,12 +26,14 @@ export async function POST(req: NextRequest) {
                 pass: process.env.GMAIL_APP_PASSWORD,
             },
         } as SMTPTransport.Options)
-        const mailOptions: nodemailer.SendMailOptions = {
-            from: `"Dampfwage" <${process.env.GMAIL_USER}>`,
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
             to: email,
             subject: subject,
-            html: emailContent
+            html: emailContent,
         }
+
         await transporter.sendMail(mailOptions)
         return NextResponse.json(
             {message: 'Email sent successfully!'},

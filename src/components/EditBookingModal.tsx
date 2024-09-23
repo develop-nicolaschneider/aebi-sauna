@@ -81,7 +81,7 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
         {
             name: 'email',
             label: 'Email',
-            placeholder: 'email@email.ch',
+            placeholder: 'deine@email.ch',
             title: 'Email',
             type: 'text',
             defaultValue: user ? user.id : '',
@@ -121,13 +121,11 @@ export const EditBookingModal = ({isOpen, onOpenChange, booking, bookingList, ha
     ]
 
     function isDateFromBookingsUnavailable(bookings: Booking[], date: DateValue) {
-        console.log(bookings, date)
         if (bookings.length > 0) {
             return bookings.some(
                 (bookingItem) => {
                     if (bookingItem.booking_from !== '' && bookingItem.booking_to !== '') {
                         if (booking !== undefined) {
-                            console.log('booking', booking.booking_to, bookingItem.booking_to)
                             if (booking.booking_to === bookingItem.booking_to) {
                                 return false
                             } if (booking.booking_from === bookingItem.booking_from) {

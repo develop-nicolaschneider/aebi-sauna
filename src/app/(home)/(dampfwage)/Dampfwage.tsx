@@ -2,9 +2,20 @@
 
 import React from "react"
 import {Fade} from "react-awesome-reveal"
-import dampfwageWood from "../../../../public/images/dampfwage-wood.jpg"
-import dampfwageInside from "../../../../public/images/dampfwage-inside.jpg"
-import dampfwageOutside from "../../../../public/images/dampfwage-outside-open-door.jpg"
+
+import planning_01_room from '../../../../public/images/dampfwage/planning/dampfwage-wood.jpg'
+import planning_02_room from '../../../../public/images/dampfwage/planning/IMG20240802201619.jpg'
+import planning_03_room from '../../../../public/images/dampfwage/planning/IMG20240817192557.jpg'
+import planning_04_room from '../../../../public/images/dampfwage/planning/IMG20240817192552.jpg'
+
+import work_01_wood from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+import work_02_wood from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+import work_03_wood from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+
+import result_01_result from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+import result_02_result from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+import result_03_result from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+
 import {DampfwageCard} from "@/app/(home)/(dampfwage)/DampfwageCard"
 
 const Dampfwage = () => {
@@ -12,19 +23,19 @@ const Dampfwage = () => {
     const cards = [
         {
             key: 'card-1',
-            img: [dampfwageWood,dampfwageWood],
+            img: [planning_01_room, planning_02_room, planning_03_room, planning_04_room],
             title: "Planung",
             description: "Der Dampfwagen ist die zweite selbstgebaute mobile Sauna. Mehr Platz im Innenraum, ein Vorraum zum Umziehen, ein Panoramafenster und der neue Holzofen zeichnen den Dampfwagen aus",
         },
         {
             key: 'card-2',
-            img: [dampfwageInside, dampfwageInside],
+            img: [work_01_wood, work_02_wood, work_03_wood],
             title: "Bau",
-            description: "Die Sauna wurde komplett selbst gebaut aus massivem Holz. Der Eckbank bietet Platz für ca. 4- max. 6 Personen.",
+            description: "Die Sauna wurde komplett selbst gebaut aus massivem Holz. Der Eckbank bietet Platz für ca. 4 bis maximal 6 Personen.",
         },
         {
             key: 'card-3',
-            img: [dampfwageOutside, dampfwageOutside],
+            img: [result_01_result, result_02_result, result_03_result],
             title: "Resultat",
             description: "Das Treppchen zur puren Entspannung! Der geräumige Vorraum kann zum Umziehen und als Ablage genutzt werden. Durch die Glastüre geht’s dann direkt in die heisse Schwitzstube."
         }
