@@ -3,18 +3,17 @@
 import React from "react"
 import {Fade} from "react-awesome-reveal"
 
-import planning_01_room from '../../../../public/images/dampfwage/planning/dampfwage-wood.jpg'
-import planning_02_room from '../../../../public/images/dampfwage/planning/IMG20240802201619.jpg'
-import planning_03_room from '../../../../public/images/dampfwage/planning/IMG20240817192557.jpg'
-import planning_04_room from '../../../../public/images/dampfwage/planning/IMG20240817192552.jpg'
+import planning_01 from '../../../../public/images/dampfwage/planning/dampfwage-window.jpg'
+import planning_02 from '../../../../public/images/dampfwage/planning/dampfwage-changing-room.jpg'
+import planning_03 from '../../../../public/images/dampfwage/planning/dampfwage-changing-room2.jpg'
 
-import work_01_wood from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
-import work_02_wood from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
-import work_03_wood from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+import work_01 from '../../../../public/images/dampfwage/work/dampfwage-wood.jpg'
+import work_02 from '../../../../public/images/dampfwage/work/dampfwage-work.jpg'
+import work_03 from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
 
-import result_01_result from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
-import result_02_result from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
-import result_03_result from '../../../../public/images/dampfwage/work/dampfwage-inside.jpg'
+import result_01 from '../../../../public/images/dampfwage/result/dampfwage-outside.jpg'
+import result_02 from '../../../../public/images/dampfwage/result/dampfwage-inside.jpg'
+import result_03 from '../../../../public/images/dampfwage/result/dampfwage-bench.jpg'
 
 import {DampfwageCard} from "@/app/(home)/(dampfwage)/DampfwageCard"
 
@@ -23,19 +22,19 @@ const Dampfwage = () => {
     const cards = [
         {
             key: 'card-1',
-            img: [planning_01_room, planning_02_room, planning_03_room, planning_04_room],
+            img: [planning_01, planning_02, planning_03],
             title: "Planung",
             description: "Der Dampfwagen ist die zweite selbstgebaute mobile Sauna. Mehr Platz im Innenraum, ein Vorraum zum Umziehen, ein Panoramafenster und der neue Holzofen zeichnen den Dampfwagen aus",
         },
         {
             key: 'card-2',
-            img: [work_01_wood, work_02_wood, work_03_wood],
+            img: [work_01, work_02, work_03],
             title: "Bau",
             description: "Die Sauna wurde komplett selbst gebaut aus massivem Holz. Der Eckbank bietet Platz für ca. 4 bis maximal 6 Personen.",
         },
         {
             key: 'card-3',
-            img: [result_01_result, result_02_result, result_03_result],
+            img: [result_01, result_02, result_03],
             title: "Resultat",
             description: "Das Treppchen zur puren Entspannung! Der geräumige Vorraum kann zum Umziehen und als Ablage genutzt werden. Durch die Glastüre geht’s dann direkt in die heisse Schwitzstube."
         }

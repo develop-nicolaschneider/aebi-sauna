@@ -4,7 +4,10 @@ import {Button, Card, CardBody, CardHeader, Divider} from "@nextui-org/react"
 import {useRouter} from "next/navigation"
 import Image from "next/image"
 import React from "react"
-import titleImage1 from '../../../public/images/dampfwage-outside.jpg'
+import dampfwageOutsideOpenDoor from '../../../public/images/home/dampfwage-outside-open-door.jpg'
+import dampfwageOutsideEvening from '../../../public/images/home/dampfwage-outside-evening.jpg'
+import dampfwageInsideBench from '../../../public/images/home/dampfwage-inside-bench.jpg'
+import dampfwageInsideOven from '../../../public/images/home/dampfwage-inside-oven.jpg'
 import {Fade} from 'react-awesome-reveal'
 import {Swiper, SwiperSlide} from "swiper/react"
 import {Pagination, Autoplay} from 'swiper/modules'
@@ -16,17 +19,17 @@ const Home = () => {
     const router = useRouter()
     const swiperImages = [
         {
-            image: titleImage1
+            image: dampfwageOutsideEvening
         },
         {
-            image: titleImage1
+            image: dampfwageOutsideOpenDoor
         },
         {
-            image: titleImage1
+            image: dampfwageInsideBench
         },
         {
-            image: titleImage1
-        }
+            image: dampfwageInsideOven
+        },
     ]
     return (
         <Fade triggerOnce duration={500}>
@@ -62,7 +65,7 @@ const Home = () => {
                 </div>
                 <div className="w-full h-full sm:max-w-screen-sm flex justify-center items-center">
                     <Card
-                        className="min-w-full h-fit rounded-md"
+                        className="w-full h-fit rounded-md max-w-sm"
                         shadow="md"
                         radius="none">
                         <CardHeader className="pb-0 py-2 p-4 flex-col items-start">
@@ -75,7 +78,7 @@ const Home = () => {
                                 pagination
                                 autoplay={{delay: 3000}}
                                 modules={[Pagination, Autoplay]}
-                                className="w-full h-auto">
+                                className="w-full h-auto max-w-sm">
                                 {swiperImages.map(({image}, index) => (
                                     <SwiperSlide
                                         key={`slide-${index}`}
@@ -83,14 +86,14 @@ const Home = () => {
                                         <Image
                                             key={`image-${index}`}
                                             src={image}
-                                            sizes="100vw"
+                                            sizes="fill"
                                             style={{
                                                 width: '100%',
                                                 height: 'auto'
                                             }}
                                             placeholder="blur"
                                             alt="Bild mobile Sauna"
-                                            className="ransition-transform duration-300 transform hover:scale-105"
+                                            className="transition-transform duration-300 transform hover:scale-105"
                                         />
                                     </SwiperSlide>
                                 ))}

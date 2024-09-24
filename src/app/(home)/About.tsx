@@ -3,6 +3,7 @@
 import {Fade} from "react-awesome-reveal"
 import React from "react"
 import Image from "next/image"
+import aboutImage from '../../../public/images/about/about-tobias.jpg'
 
 const About = () => {
     return (
@@ -17,8 +18,8 @@ const About = () => {
                         alt="Bild von Tobias Aebi"
                         width={600}
                         height={600}
-                        src="/Avatar.png"
-                        className="rounded-full transition-transform duration-300 transform hover:scale-105"
+                        src={aboutImage}
+                        className="rounded-full shadow-xl transition-transform duration-300 transform hover:scale-105"
                     />
                 </div>
                 <q className="col-start-1 col-end-2 lg:col-start-2 lg:col-end-3 lg:justify-self-end font-semibold text-sm sm:text-base content-center lg:content-end text-center">

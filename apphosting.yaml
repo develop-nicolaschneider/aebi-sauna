@@ -1,0 +1,38 @@
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: firebaseApiKeySecret
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "aebi-sauna.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "aebi-sauna"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "aebi-sauna.appspot.com"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "881592451489"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:881592451489:web:bd9b1cd39ca5ca34714be0"
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: "G-LKBZLKHCNC"
+
+  # AUTH
+  - variable: FIREBASE_ADMIN_CONFIG_CLIENT_EMAIL
+    secret: firebaseAdminConfigClientEmailSecret
+  - variable: FIREBASE_ADMIN_CONFIG_PRIVATE_KEY
+    secret: firebaseAdminConfigPrivateKeySecret
+
+  - variable: JWT_SECRET_KEY
+    secret: jwtSecretKeySecret
+
+  # GMAIL
+  - variable: NEXT_PUBLIC_SEND_EMAILS
+    value: "true"
+  - variable: GMAIL_SERVICE
+    value: "gmail"
+  - variable: GMAIL_HOST
+    value: "smtp.gmail.com"
+  - variable: GMAIL_PORT
+    value: "587"
+  - variable: GMAIL_USER
+    secret: gmailUserSecret
+  - variable: GMAIL_APP_PASSWORD
+    secret: gmailAppPasswordSecret
