@@ -43,7 +43,7 @@ export async function createSession(uid: string, rememberMe?: string | undefined
     const session = await encrypt({uid, expiresAt})
     cookies().set('dampfwage-session', session, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV !== 'development',
         maxAge: maxAge,
         sameSite: 'lax',
         path: '/',

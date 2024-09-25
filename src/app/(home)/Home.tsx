@@ -96,6 +96,8 @@ const Home = () => {
                                         key={`slide-${index}`}
                                         className="flex justify-center items-center">
                                         <Image
+                                            priority
+                                            loading="eager"
                                             key={`image-${index}`}
                                             src={image}
                                             sizes="fill"
