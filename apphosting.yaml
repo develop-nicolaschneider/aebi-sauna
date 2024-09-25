@@ -22,8 +22,6 @@ env:
 
   - variable: JWT_SECRET_KEY
     secret: jwtSecretKeySecret
-  - variable: NODE_ENV
-    value: "production"
 
   # GMAIL
   - variable: NEXT_PUBLIC_SEND_EMAILS
