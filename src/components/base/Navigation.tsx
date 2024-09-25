@@ -87,6 +87,7 @@ const Navigation = ({session}: NavigationProps) => {
                 {userSessionId &&
                     <NavbarItem>
                         <Button
+                            title="Logout"
                             color="danger"
                             fullWidth={false}
                             className="w-fit"

@@ -12,7 +12,7 @@ type SessionPayload = {
 const key = new TextEncoder().encode(process.env.JWT_SECRET_KEY)
 
 const cookie = {
-    name: 'session.dampfwage.ch',
+    name: 'dampfwage-session',
     options: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
     duration: 24 * 60 * 60, // 1day
     durationRemember: 4 * 7 * 24 * 60 * 60 * 1000, // 4weeks
@@ -22,7 +22,7 @@ export async function encrypt(payload: SessionPayload) {
     return new SignJWT(payload)
         .setProtectedHeader({alg: 'HS256'})
         .setIssuedAt()
-        .setExpirationTime(`${payload.expiresAt}day`)
+        .setExpirationTime(`${payload.expiresAt} day`)
         .sign(key)
 }
 
@@ -41,9 +41,9 @@ export async function createSession(uid: string, rememberMe?: string | undefined
     const expiresAt = rememberMe ? 14 : 1 // 14days or 1day
     const maxAge = rememberMe ? 14 * 24 * 60 * 60 : 24 * 60 * 60
     const session = await encrypt({uid, expiresAt})
-    cookies().set('session.dampfwage.ch', session, {
+    cookies().set('dampfwage-session', session, {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
+        secure: process.env.NODE_ENV === 'production',
         maxAge: maxAge,
         sameSite: 'lax',
         path: '/',

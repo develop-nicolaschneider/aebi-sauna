@@ -30,8 +30,6 @@ env:
     value: "gmail"
   - variable: GMAIL_HOST
     value: "smtp.gmail.com"
-  - variable: GMAIL_PORT
-    value: "587"
   - variable: GMAIL_USER
     secret: gmailUserSecret
   - variable: GMAIL_APP_PASSWORD

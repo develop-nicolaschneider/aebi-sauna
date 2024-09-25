@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
         const emailContent = renderToStaticMarkup(<RequestSentEmailTemplate booking={booking} imageSrc={imageSrc}/>)
         const transporter = nodemailer.createTransport({
             host: process.env.GMAIL_HOST,
-            port: Number(process.env.GMAIL_PORT),
-            secure: process.env.NODE_ENV !== 'development', // Use SSL in production
+            port: process.env.NODE_ENV === 'production' ? 465 : 587,
+            secure: process.env.NODE_ENV === 'production',
             auth: {
                 user: process.env.GMAIL_USER,
                 pass: process.env.GMAIL_APP_PASSWORD,

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: { children: React.ReactNode }) {
 
-    const session = cookies().get('session.dampfwage.ch')?.value || null
+    const session = cookies().get('dampfwage-session')?.value || null
 
     return (
         <html lang="de" className={montserrat.className + " text-xl"}>

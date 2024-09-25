@@ -1,7 +1,7 @@
 import {Card, CardBody, CardFooter} from "@nextui-org/react"
 import Image from "next/image"
 import {StaticImport} from "next/dist/shared/lib/get-img-props"
-import {Autoplay, Pagination} from "swiper/modules"
+import {Autoplay, EffectCreative, Pagination} from "swiper/modules"
 import {Swiper, SwiperSlide} from "swiper/react"
 
 interface DampfwageCardProps {
@@ -20,9 +20,21 @@ export const DampfwageCard = ({img, title, description}: DampfwageCardProps) => 
                 {img.length > 1 ?
                     <Swiper
                         loop
+                        effect="creative"
+                        grabCursor
+                        speed={1000}
+                        creativeEffect={{
+                            prev: {
+                                shadow: true,
+                                translate: [0, 0, -400],
+                            },
+                            next: {
+                                translate: ['100%', 0, 0],
+                            },
+                        }}
                         pagination
-                        autoplay={{delay: 3000, pauseOnMouseEnter: true}}
-                        modules={[Pagination, Autoplay]}
+                        autoplay={{delay: 5000, pauseOnMouseEnter: true}}
+                        modules={[EffectCreative, Pagination, Autoplay]}
                         className="w-full h-auto">
                         {img.map((img, index) => (
                             <SwiperSlide

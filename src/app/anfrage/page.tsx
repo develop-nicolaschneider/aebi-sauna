@@ -222,6 +222,7 @@ export default function Anfrage() {
         const checkBookings = await getBookings()
         data['booking_from'] = isDateSelected ? selectedRange.start.toString() : ''
         data['booking_to'] = isDateSelected ? selectedRange.end.toString() : ''
+        data['phoneNumber'] = data.phoneNumber.toString().replaceAll(' ', '')
 
         if (isDateSelected && checkBookings !== null) {
             setBookings(checkBookings)
@@ -324,7 +325,7 @@ export default function Anfrage() {
             setFocusedDate(selectedRange?.start ? selectedRange?.start : minValue)
             return
         } else if (response.type === 'server') {
-            // ToDo server error handling
+            console.error(response.message)
             setErrors({})
         } else if (response.type === 'success') {
             setErrors({})
@@ -341,7 +342,7 @@ export default function Anfrage() {
                 })
                 await res.json()
                 if (!res.ok) {
-                    // ToDO server error handling
+                    console.error(res)
                 }
             }
             const params = new URLSearchParams(searchParams.toString())
@@ -394,7 +395,7 @@ export default function Anfrage() {
                                         placeholder={field.placeholder}
                                         title={field.title}
                                         type={field.type === 'number' ? 'text' : field.type}
-                                        inputMode={field.type === 'number' ? 'numeric' : field.type}
+                                        inputMode={field.type === 'number' || 'tel' ? 'numeric' : field.type}
                                         autoComplete={field.autoComplete}
                                         isInvalid={!!errors?.fieldErrors?.[field.name]}
                                         errorMessage={errors?.fieldErrors?.[field.name]}
@@ -468,7 +469,7 @@ export default function Anfrage() {
                                     weekdayStyle="short"
                                 />
                             </Tooltip>
-                            <Switch size="sm" isSelected={isDateSelected} onValueChange={setIsDateSelected}>
+                            <Switch name="date-switch" size="sm" isSelected={isDateSelected} onValueChange={setIsDateSelected}>
                                 Wunschdatum wählen
                             </Switch>
                             <small className="text-center text-zinc-400 leading-5 max-w-sm">

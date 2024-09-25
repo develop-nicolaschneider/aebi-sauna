@@ -10,7 +10,7 @@ import dampfwageInsideBench from '../../../public/images/home/dampfwage-inside-b
 import dampfwageInsideOven from '../../../public/images/home/dampfwage-inside-oven.jpg'
 import {Fade} from 'react-awesome-reveal'
 import {Swiper, SwiperSlide} from "swiper/react"
-import {Pagination, Autoplay} from 'swiper/modules'
+import {Pagination, Autoplay, EffectCreative} from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import '../styles/styles.css'
@@ -75,9 +75,21 @@ const Home = () => {
                         <CardBody className="overflow-visible relative p-0 contain-inline-size">
                             <Swiper
                                 loop
+                                effect="creative"
+                                grabCursor
+                                speed={1000}
+                                creativeEffect={{
+                                    prev: {
+                                        shadow: true,
+                                        translate: [0, 0, -400],
+                                    },
+                                    next: {
+                                        translate: ['100%', 0, 0],
+                                    },
+                                }}
                                 pagination
-                                autoplay={{delay: 3000}}
-                                modules={[Pagination, Autoplay]}
+                                autoplay={{delay: 5000, pauseOnMouseEnter: true}}
+                                modules={[EffectCreative, Pagination, Autoplay]}
                                 className="w-full h-auto max-w-sm">
                                 {swiperImages.map(({image}, index) => (
                                     <SwiperSlide
