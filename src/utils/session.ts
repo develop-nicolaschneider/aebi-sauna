@@ -45,8 +45,9 @@ export async function createSession(uid: string, rememberMe?: string | undefined
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
         maxAge: maxAge,
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/',
+        domain: process.env.NODE_ENV !== 'development' ? '.dampfwage.ch' : undefined,
     })
     redirect('/dashboard')
 }
