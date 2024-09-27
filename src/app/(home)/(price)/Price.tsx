@@ -24,7 +24,7 @@ const Price = () => {
         {
             title: '1 Woche',
             price: 'CHF 480.-',
-            subtitle: '8 Tage am Stück schwitzen',
+            subtitle: '7 Tage am Stück schwitzen',
             description: 'Geniesse den Dampfwagen eine ganze Woche lang!'
         },
         {
@@ -45,7 +45,7 @@ const Price = () => {
         {
             title: 'Lieferkosten',
             price: 'inklusive',
-            subtitle: '5km rund um Koppigen kostenlos!',
+            subtitle: '5 km rund um Koppigen kostenlos!',
             description: 'Die Distanz wird anhand von Google Maps berechnet.'
         },
         {
@@ -65,10 +65,10 @@ const Price = () => {
                 'Defekte, allfällige Reparaturen oder fehlende Gegenstände werden dem Mieter verrechnet. '
         },
         {
-            title: 'Feuerholz',
+            title: 'Brennholz',
             price: 'CHF 15.-',
             subtitle: 'Zusätzliches Feuerholz für ca. 4 Stunden saunieren',
-            description: 'Feuerholz für ca. 4 Stunden saunieren ist inklusive. Falls Du mehr Holz benötigst, kann dieses direkt mitbestellt werden.',
+            description: 'Brennholz für ca. 4 Stunden saunieren ist inklusive. Falls Du mehr Holz benötigst, kann dieses direkt mitbestellt werden.',
         },
     ]
 

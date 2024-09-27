@@ -17,7 +17,7 @@ const Impressum = () => {
                     <Link
                         className="text-xs sm:text-xs md:text-sm lg:text-base"
                         isExternal
-                        href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage&body=Hallo Tobias%0A%0AMein Anliegen zum Dampfwage:"
+                        href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage"
                         target="_blank"
                         rel="noopener noreferrer">
                         dampfwage@gmail.com

@@ -28,7 +28,7 @@ import {
     ButtonGroup, Badge
 } from "@nextui-org/react"
 import {deleteBooking, getBookings, updateBookingState} from "@/utils/firebase"
-import React, {Fragment, useCallback, useMemo, useState} from "react"
+import React, {Fragment, useCallback, useEffect, useMemo, useState} from "react"
 import {BookingDateFilter, BookingState, getColorByValue, getDateFilterKey, getKeyByValue} from "@/types/BookingState"
 import ConvertToChDate from "@/utils/ConvertToChDate"
 import {useAsyncList} from "@react-stately/data"
@@ -46,7 +46,7 @@ import CommentIcon from '@mui/icons-material/Comment'
 import {BookingUser} from "@/types/BookingUser"
 import {Link} from "@nextui-org/link"
 import {Loading, LoadingAnimation} from "@/components/base/Loading"
-import EmailModal from "@/app/dashboard/EmailModal"
+import {verifySession} from "@/utils/session"
 
 const bookingColumns = [
     {key: "user", label: "Kontakt"},
@@ -59,6 +59,7 @@ const bookingColumns = [
 
 const Dashboard = () => {
     const [loading, setLoading] = useState(true)
+    const [isVerified, setIsVerified] = useState(false)
     const [filterValue, setFilterValue] = useState('')
     const [statusFilter, setStatusFilter] = useState<Selection>('all')
     const [dateFilter, setDateFilter] = useState<Selection>('all')
@@ -66,8 +67,7 @@ const Dashboard = () => {
     const [, setSelectedState] = useState<SharedSelection>(new Set([]))
     const {isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange} = useDisclosure()
     const {isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange} = useDisclosure()
-    const {isOpen: isEmailOpen, onOpen: onEmailOpen, onOpenChange: onEmailOpenChange} = useDisclosure()
-    const [stateBooking, setStateBooking] = useState<Booking>()
+    const [, setStateBooking] = useState<Booking>()
     const [editBooking, setEditBooking] = useState<Booking>()
     const [modalContent, setModalContent] = useState({
         title: "",
@@ -152,30 +152,6 @@ const Dashboard = () => {
         ,
         [filterValue, hasSearchFilter, list.items, dateFilter, statusFilter]
     )
-
-    const handleStateChange = async (emailModalData: { message: string }) => {
-        if (stateBooking !== undefined) {
-            try {
-                // const pdfStream = await renderToStream(<AgreementPdf booking={stateBooking} emailData={emailModalData} />)
-                const res = await fetch('api/sendEmail', {
-                    method: 'POST',
-                    headers: {'content-type': 'application/json'},
-                    body: JSON.stringify({
-                        email: stateBooking?.user?.id,
-                        subject: 'Anfrage bestätigt & Mietvertrag',
-                        booking: stateBooking,
-                        emailModalData: emailModalData,
-                    })
-                })
-                await res.json()
-                if (!res.ok) {
-                    console.error(res)
-                }
-            } catch (error) {
-                console.error(error)
-            }
-        }
-    }
 
     const handleSelectChange = async (id: string, value: SharedSelection, booking: Booking) => {
         if (id && value.currentKey && booking.booking_state !== value.currentKey) {
@@ -296,6 +272,14 @@ const Dashboard = () => {
         } else {
             setFilterValue('')
         }
+    }, [])
+
+    useEffect(() => {
+        (async () => {
+            setIsVerified(false)
+            await verifySession()
+            setIsVerified(true)
+        })()
     }, [])
 
     const topContent = useMemo(() => {
@@ -513,38 +497,40 @@ const Dashboard = () => {
 
     return (
         <Loading>
-            <Table
-                className="mt-5"
-                aria-label="Buchungstabelle"
-                topContent={topContent}
-                bottomContent={!loading && bottomContent}
-                sortDescriptor={list.sortDescriptor}
-                onSortChange={list.sort}>
-                <TableHeader columns={bookingColumns}>
-                    {(column) => (
-                        <TableColumn
-                            key={column.key}
-                            align={column.key === 'booking_state' || column.key === 'edit' ? 'center' : 'start'}
-                            allowsSorting={column.key !== 'edit'}
-                        >{column.label}</TableColumn>
-                    )}
-                </TableHeader>
-                <TableBody
-                    isLoading={loading}
-                    loadingContent={<LoadingAnimation/>}
-                    emptyContent={"Keine Buchungen vorhanden"}
-                    items={filteredItems}>
-                    {(item) => (
-                        <TableRow key={item.id}>
-                            {(columnKey) =>
-                                <TableCell>
-                                    {renderCell(item, columnKey)}
-                                </TableCell>}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            {editBooking && (
+            {!isVerified ? <LoadingAnimation/> :
+                <Table
+                    className="mt-5"
+                    aria-label="Buchungstabelle"
+                    topContent={topContent}
+                    bottomContent={!loading && bottomContent}
+                    sortDescriptor={list.sortDescriptor}
+                    onSortChange={list.sort}>
+                    <TableHeader columns={bookingColumns}>
+                        {(column) => (
+                            <TableColumn
+                                key={column.key}
+                                align={column.key === 'booking_state' || column.key === 'edit' ? 'center' : 'start'}
+                                allowsSorting={column.key !== 'edit'}
+                            >{column.label}</TableColumn>
+                        )}
+                    </TableHeader>
+                    <TableBody
+                        isLoading={loading}
+                        loadingContent={<LoadingAnimation/>}
+                        emptyContent={"Keine Buchungen vorhanden"}
+                        items={filteredItems}>
+                        {(item) => (
+                            <TableRow key={item.id}>
+                                {(columnKey) =>
+                                    <TableCell>
+                                        {renderCell(item, columnKey)}
+                                    </TableCell>}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            }
+            {editBooking &&
                 <EditBookingModal
                     isOpen={isEditOpen}
                     onOpenChange={onEditOpenChange}
@@ -552,10 +538,8 @@ const Dashboard = () => {
                     bookingList={list.items}
                     handleEditReload={handleEditReload}
                 />
-            )}
-            <EmailModal isOpen={isEmailOpen} onOpenChange={onEmailOpenChange} stateChange={handleStateChange}/>
-
-            <ModalComponent
+            }
+            < ModalComponent
                 isOpen={isDeleteOpen}
                 onOpenChange={onDeleteOpenChange}
                 modalContent={modalContent}/>

@@ -15,7 +15,7 @@ import {Divider} from "@nextui-org/react";
 const HowItWorks = () => {
     const items = [
         {
-            icon: <SendIcon className="-rotate-12 w-fit"/>,
+            icon: <SendIcon className="-rotate-12"/>,
             title: 'Anfrage senden',
             description: 'Du kontaktierst mich über das Anfrage-Formular und gibst Deinen Wunschtermin ein.',
             color: 'bg-yellow-100'
@@ -23,7 +23,7 @@ const HowItWorks = () => {
         {
             icon: <ReplyIcon fontSize="large"/>,
             title: 'Rückmeldung',
-            description: 'Deine Anfrage oder Dein Anliegen werde ich schnellstmöglich bearbeiten und Dir eine Rückmeldung geben.',
+            description: 'Deine Anfrage oder Dein Anliegen wird rasch bearbeitet damit du schnellstmöglich eine Rückmeldung erhältst.',
             color: 'bg-yellow-200'
         },
         {
@@ -35,19 +35,19 @@ const HowItWorks = () => {
         {
             icon: <Image src={icon} alt="dampfwage-icon" height={40} width={40}/>,
             title: 'Auslieferung',
-            description: 'Am vereinbarten Termin liefere ich Dir die Sauna bequem an Deinen gewünschten Ort zur abgemachten Zeit.',
+            description: 'Am vereinbarten Termin wird die Sauna bequem an Deinen gewünschten Ort zur abgemachten Zeit geliefert.',
             color: 'bg-yellow-400'
         }
     ]
 
     const advantages = [
-        "Saunieren, wo du willst für max. 4-6 Personen",
+        "Sauniere wo du willst, für 4-6 Personen",
         "Finnischer Holzofen",
         "Eine Kiste Holz für ca. 4 Stunden saunieren (weitere können dazu gekauft werden)",
         "Saunakübel mit Schöpfkelle für Aufgüsse",
         "Panoramafenster",
         "Vorraum zum Umziehen, Taschen verstauen, Gegenstände deponieren",
-        "Eine kleine Garderobe, um Utensilien aufzuhängen",
+        "Eine kleine Garderobe um Utensilien aufzuhängen",
         "Indirekte Innenbeleuchtung"
     ]
 

@@ -1,15 +1,8 @@
 'use server'
 
-import {jwtVerify, SignJWT} from "jose"
 import {redirect} from "next/navigation"
 import {cookies} from "next/headers"
-
-type SessionPayload = {
-    uid: string
-    expiresAt: number
-}
-
-const key = new TextEncoder().encode(process.env.JWT_SECRET_KEY)
+import {auth} from "../../config/firebaseAdmin"
 
 const cookie = {
     name: 'dampfwage-session',
@@ -18,47 +11,20 @@ const cookie = {
     durationRemember: 4 * 7 * 24 * 60 * 60 * 1000, // 4weeks
 }
 
-export async function encrypt(payload: SessionPayload) {
-    return new SignJWT(payload)
-        .setProtectedHeader({alg: 'HS256'})
-        .setIssuedAt()
-        .setExpirationTime(`${payload.expiresAt} day`)
-        .sign(key)
-}
-
-export async function decrypt(session: string | undefined = '') {
-    try {
-        const {payload} = await jwtVerify(session, key, {
-            algorithms: ['HS256'],
-        })
-        return payload
-    } catch (error) {
-        return null
-    }
-}
-
-export async function createSession(uid: string, rememberMe?: string | undefined) {
-    const expiresAt = rememberMe ? 14 : 1 // 14days or 1day
-    const maxAge = rememberMe ? 14 * 24 * 60 * 60 : 24 * 60 * 60
-    const session = await encrypt({uid, expiresAt})
-    cookies().set('dampfwage-session', session, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        maxAge: maxAge,
-        sameSite: 'none',
-        path: '/',
-        domain: process.env.NODE_ENV !== 'development' ? '.dampfwage.ch' : undefined,
-    })
-    redirect('/dashboard')
-}
-
 export async function verifySession() {
-    const myCookie = cookies().get(cookie.name)?.value
-    const session = await decrypt(myCookie)
-    if (!session?.uid) {
+    const sessionCookie = cookies().get('dampfwage-session')?.value
+    if (!sessionCookie) {
         redirect('/login')
     }
-    return {isAuth: true, uid: session.uid}
+    try {
+        // Verify the session cookie using Firebase Admin SDK (server-side only)
+        await auth.verifySessionCookie(sessionCookie, true);
+        return true
+        // return null
+    } catch (error) {
+        console.error('Session verification failed:', error)
+        redirect('/login')
+    }
 }
 
 export async function deleteSession() {

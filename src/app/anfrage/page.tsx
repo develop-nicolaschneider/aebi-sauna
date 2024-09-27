@@ -370,7 +370,7 @@ export default function Anfrage() {
                         <h1 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl md:col-span-2">Anfrage
                             senden</h1>
                         <p className="text-xs sm:text-xs md:text-sm lg:text-base mb-2 md:col-span-2 text-center">
-                            Sende Deine Anfrage zur Saunamiete jetzt! Wähle Deine Wunschdaten zur Saunamiete direkt
+                            Sende Deine Anfrage zur Saunamiete jetzt! Wähle Deine unverbindlichen Wunschdaten zur Saunamiete direkt
                             im
                             Kalender.
                             Bei Fragen und Miete von längerer Dauer nutze das Feld
@@ -378,7 +378,7 @@ export default function Anfrage() {
                             <Link
                                 className="text-xs sm:text-xs md:text-sm lg:text-base"
                                 isExternal
-                                href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage&body=Hallo Tobias%0A%0AMein Anliegen zum Dampfwage:"
+                                href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage"
                                 target="_blank"
                                 rel="noopener noreferrer">
                                 &nbsp;dampfwage@gmail.com
@@ -473,8 +473,7 @@ export default function Anfrage() {
                                 Wunschdatum wählen
                             </Switch>
                             <small className="text-center text-zinc-400 leading-5 max-w-sm">
-                                Wochenendanfragen nur Sa+So möglich.<br/>
-                                Längere Buchungsdauer in den Bemerkungen erwähnen.
+                                Wochenendanfragen nur Sa+So möglich.
                             </small>
                         </div>
                         <div className="text-center h-full self-center leading-5">

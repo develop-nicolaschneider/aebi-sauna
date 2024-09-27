@@ -4,11 +4,12 @@ import {Button, Input, Checkbox, Card, CardHeader, CardBody, CardFooter} from "@
 import {useState} from 'react'
 import {LoginFormSchema} from "@/utils/LoginFormSchema"
 import {signIn} from "@/utils/firebaseAuth"
-import {createSession} from "@/utils/session"
+import {useRouter} from "next/navigation"
 
 const Login = () => {
     const [errors, setErrors] = useState<any>({})
     const [submitting, setSubmitting] = useState(false)
+    const router = useRouter()
     const loginFields = [
         {
             name: 'email',
@@ -38,11 +39,23 @@ const Login = () => {
             setSubmitting(false)
             return
         }
+        const rememberMe = data.rememberMe !== undefined
         try {
             const userUid = await signIn(result.data)
             if (userUid !== undefined) {
-                const token = userUid.uid
-                await createSession(token, result.data.rememberMe)
+                const idToken = await userUid.getIdToken()
+                const response = await fetch('api/session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ idToken, rememberMe: rememberMe }),
+                })
+                if (!response.ok) {
+                    console.error(response)
+                } else {
+                    router.push('/dashboard')
+                }
             }
         } catch (error: any) {
             console.error(error.message);

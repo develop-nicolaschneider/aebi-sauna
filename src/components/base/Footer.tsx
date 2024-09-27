@@ -12,35 +12,35 @@ export default function Footer() {
                 <Link
                     isBlock
                     isExternal
-                    href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage&body=Hallo Tobias%0A%0AMein Anliegen zum Dampfwage:"
+                    href="mailto:dampfwage@gmail.com?subject=Anfrage Dampfwage"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm sm:text-sm md:text-base">
+                    className="text-xs sm:text-sm">
                     Kontakt via Email &nbsp; <EmailIconOutlined fontSize="inherit"
                                                                 className={clsx(link({color: 'primary'}))}/>
                 </Link>
             </div>
-            <div className="flex flex-col justify-center md:flex-row items-center h-fit space-x-0 md:space-x-4 space-y-2 md:space-y-0 my-4">
+            <div className="flex flex-col justify-center sm:flex-row items-center h-fit space-x-0 sm:space-x-4 space-y-2 sm:space-y-0 my-4">
                 <Link
                     href="/impressum"
                     as={NextLink}
-                    className="text-sm sm:text-sm md:text-base">
+                    className="text-xs sm:text-sm">
                     Impressum
                 </Link>
-                <Divider orientation="vertical" className="hidden md:inline bg-zinc-400"/>
+                <Divider orientation="vertical" className="hidden sm:inline bg-zinc-400"/>
                 <Link
                     isExternal
                     href="/files/Nutzungsbedingungen.pdf"
                     target="_blank"
                     as={NextLink}
-                    className="text-sm sm:text-sm md:text-base">
+                    className="text-xs sm:text-sm">
                     Nutzungsbedingungen
                 </Link>
-                <Divider orientation="vertical" className="hidden md:inline bg-zinc-400"/>
+                <Divider orientation="vertical" className="hidden sm:inline bg-zinc-400"/>
                 <Link
                     href="/disclaimer"
                     as={NextLink}
-                    className="text-sm sm:text-sm md:text-base">
+                    className="text-xs sm:text-sm">
                     Datenschutz
                 </Link>
             </div>

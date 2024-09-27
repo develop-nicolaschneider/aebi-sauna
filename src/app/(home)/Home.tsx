@@ -4,8 +4,9 @@ import {Button, Card, CardBody, CardHeader, Divider} from "@nextui-org/react"
 import {useRouter} from "next/navigation"
 import Image from "next/image"
 import React from "react"
-import dampfwageOutsideOpenDoor from '../../../public/images/home/dampfwage-outside-open-door.jpg'
 import dampfwageOutsideEvening from '../../../public/images/home/dampfwage-outside-evening.jpg'
+import dampfwageOutside from '../../../public/images/home/dampfwage-outside.jpg'
+import dampfwageOutside2 from '../../../public/images/home/dampfwage-outside2.jpg'
 import dampfwageInsideBench from '../../../public/images/home/dampfwage-inside-bench.jpg'
 import dampfwageInsideOven from '../../../public/images/home/dampfwage-inside-oven.jpg'
 import {Fade} from 'react-awesome-reveal'
@@ -22,7 +23,10 @@ const Home = () => {
             image: dampfwageOutsideEvening
         },
         {
-            image: dampfwageOutsideOpenDoor
+            image: dampfwageOutside
+        },
+        {
+            image: dampfwageOutside2
         },
         {
             image: dampfwageInsideBench
@@ -50,8 +54,6 @@ const Home = () => {
                     <p className="text-center text-sm md:text-base lg:text-lg">
                         Erlebe die pure Entspannung – egal ob gemütlich zu zweit, mit Freunden, Kollegen oder für ein
                         Teamevent jeder Art. Die mobile Dampfwage-Sauna fährt direkt an deinen Wunschort.<br/>
-                        Ambiente bietet dir ein traditioneller finnischer Holzofen, indirekte Innenbeleuchtung, ein
-                        Panoramafenster für die perfekte Aussicht, ein kleiner Vorraum zum Umziehen und vieles mehr.
                         Bereit, richtig ins Schwitzen zu kommen?<br/>
                         <span className="font-bold">&nbsp; Jetzt ganz einfach einen Termin anfragen!</span>
                     </p>
@@ -70,7 +72,7 @@ const Home = () => {
                         radius="none">
                         <CardHeader className="pb-0 py-2 p-4 flex-col items-start">
                             <h4 className="font-bold text-medium sm:text-large">Mobile Sauna mit Holzofen</h4>
-                            <small className="text-default-500 ">Geliefert rund um Koppigen</small>
+                            <small className="text-default-500 ">Geliefert ab 3425 Koppigen</small>
                         </CardHeader>
                         <CardBody className="overflow-visible relative p-0 contain-inline-size">
                             <Swiper

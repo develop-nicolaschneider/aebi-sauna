@@ -3,9 +3,8 @@
 import React from "react"
 import {Fade} from "react-awesome-reveal"
 
-import planning_01 from '../../../../public/images/dampfwage/planning/dampfwage-window.jpg'
-import planning_02 from '../../../../public/images/dampfwage/planning/dampfwage-changing-room.jpg'
-import planning_03 from '../../../../public/images/dampfwage/planning/dampfwage-changing-room2.jpg'
+import planning_01 from '../../../../public/images/dampfwage/planning/dampfwage-outside.jpg'
+import planning_02 from '../../../../public/images/dampfwage/planning/dampfwage-room.jpg'
 
 import work_01 from '../../../../public/images/dampfwage/work/dampfwage-wood.jpg'
 import work_02 from '../../../../public/images/dampfwage/work/dampfwage-work.jpg'
@@ -22,7 +21,7 @@ const Dampfwage = () => {
     const cards = [
         {
             key: 'card-1',
-            img: [planning_01, planning_02, planning_03],
+            img: [planning_01, planning_02],
             title: "Planung",
             description: "Der Dampfwagen ist die zweite selbstgebaute mobile Sauna. Mehr Platz im Innenraum, ein Vorraum zum Umziehen, ein Panoramafenster und der neue Holzofen zeichnen den Dampfwagen aus",
         },
@@ -48,17 +47,11 @@ const Dampfwage = () => {
                     Das Projekt
                 </h1>
                 <p className="text-xs sm:text-xs md:text-sm lg:text-base mb-2 col-span-1 md:col-span-3 text-center">
-                    Bereits seit 2020 besitze ich eine mobile Sauna. Diese wurde bis anhin mit Strom betrieben.
-                    Im Januar 2024 entdeckte ich dann das traditionelle Ambiente einer holzbefeuerten Sauna.
-                    Danach war mit klar, dass ich mir selbst eine Holzofensauna bauen will, natürlich, traditionell und
-                    nachhaltig mit Fichtenholz.
-                    So begann ich im Frühling 2024 mit der Planung der mobilen Sauna – schliesslich soll sie am Ende ja
-                    perfekt auf den Anhänger passen, möglichst kompakt sein und ein einmaliges Saunaerlebnis bieten.
-                    Nach langer Planung war es dann so weit.
-                    Mitten im Sommer bei grösster Hitze entstand der Dampfwagen aus Massivholz und mit einem echten
-                    finnischen Holzofen.
-                    Nach vielen kleinen Detailarbeiten war der Moment da, die zweite, grössere und verbesserte mobile
-                    Sauna war geboren!
+                    Seit 2020 besitze ich eine mobile Sauna, die elektrisch betrieben wurde. Anfang 2024 entdeckte ich
+                    das besondere Flair einer holzbefeuerten Sauna und wusste sofort: Ich baue meine eigene –
+                    traditionell aus Fichtenholz. Nach intensiver Planung entstand im Sommer der Dampfwagen. Kompakt und
+                    nachhaltig gebaut, mit einem echten finnischen Holzofen. Jetzt bietet meine zweite, verbesserte mobile
+                    Sauna ein unvergleichliches Saunaerlebnis!
                 </p>
                 <Fade triggerOnce cascade damping={0.2} delay={500} className="grid justify-items-center w-full">
                     {cards.map(({key, img, title, description}) => (

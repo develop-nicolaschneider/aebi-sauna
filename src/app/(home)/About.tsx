@@ -27,14 +27,10 @@ const About = () => {
                     «Dampfwage» entstanden.
                 </q>
                 <p className="row-span-1 md:row-span-2 lg:row-span-1 text-xs sm:text-xs md:text-sm lg:text-base mb-2 text-center content-center">
-                    Tobias Aebi ist mein Name und ich bin der Gründer von «Dampfwage»
-                    Gerne bin ich in der Natur unterwegs treibe oft Sport und mag den Sommer einfach lieber als den
-                    Winter. Eine Sache, die mir die dunklen Monate jedoch etwas kurzweiliger erscheinen lässt:
-                    Regelmässige Saunagänge! Das ist nicht nur gesund und stärkt das Immunsystem, nein es ist auch
-                    sehr erholsam und macht
-                    mir auch richtig viel Spass. Das Realisieren von kleineren und grösseren Projekten bereitet mir
-                    Freude und haben mich
-                    schlussendlich auch auf die Idee gebracht, selbst eine Sauna zu bauen.
+                    Mein Name ist Tobias Aebi, und ich bin der Gründer von «Dampfwage». Ich liebe die Natur, treibe
+                    gerne Sport und bevorzuge den Sommer. Doch was mir den Winter versüßt, sind regelmäßige Saunagänge –
+                    gesund, entspannend und macht Spaß. Die Freude an Projekten hat mich schließlich dazu
+                    inspiriert, meine eigene Sauna zu bauen.
                 </p>
             </div>
         </Fade>

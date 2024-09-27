@@ -96,7 +96,7 @@ const RequestSentEmailTemplate = ({booking, imageSrc}: ConfirmationEmailTemplate
                 }
             </ul>
             <p>Falls Du noch Fragen hast, zögere nicht mich zu kontaktieren.</p>
-            <p className="noMarginBottom">Beste Grüßen</p>
+            <p className="noMarginBottom">Beste Grüße</p>
             <p className="noMarginTop">Tobias Aebi</p>
         </div>
         <div className="footer">

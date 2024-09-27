@@ -59,7 +59,7 @@ export default function MeineAnfragen() {
                         </Link>
                     </span><br/>
                     Sobald der Status als<span className="italic">&nbsp;{BookingState.CONFIRMED}&nbsp;</span>erscheint,
-                    liefere ich den Dampfwagen wie abgesprochen zu Dir.<br/>
+                    liefere ich den Dampfwagen wie vereinbart zu Dir.<br/>
                     Deine Buchung ID steht in der Email, welche Du nach dem Senden der Anfrage erhalten hast.
                 </p>
                 <form onSubmit={handleSubmit}
