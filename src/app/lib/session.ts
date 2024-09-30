@@ -45,11 +45,12 @@ export async function createSession(uid: string, rememberMe = false) {
     const session = await encrypt({uid, rememberMe})
     cookies().set(cookie.name, session, {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
+        secure: true,
+        // secure: process.env.NODE_ENV !== 'development',
         expires: expiresAt,
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/',
-        // domain: process.env.NODE_ENV !== 'development' ? '.dampfwage.ch' : undefined,
+        domain: process.env.NODE_ENV !== 'development' ? '.dampfwage.ch' : undefined,
     })
     redirect('/dashboard')
 }

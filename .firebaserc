@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "aebi-sauna"
-  }
+    "default": "aebi-sauna",
+    "staging": "aebi-sauna"
+  },
+  "targets": {},
+  "etags": {}
 }

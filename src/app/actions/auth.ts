@@ -1,12 +1,10 @@
+'use client'
+
 import {createSession, deleteSession} from "@/app/lib/session"
-import {LoginFormSchema} from "@/app/lib/LoginFormSchema"
 import {signInWithEmailAndPassword} from "firebase/auth"
 import {auth} from "../../../config/firebase"
 
 export async function signIn(data: { [p: string]: FormDataEntryValue }) {
-    if (!data) return undefined
-    const result = LoginFormSchema.safeParse(data)
-    if (!result.success) return undefined
     try {
         const result = await signInWithEmailAndPassword(auth, data.email.toString(), data.password.toString())
         if (result.user.uid) {

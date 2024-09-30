@@ -4,7 +4,6 @@ import {Button, Input, Checkbox, Card, CardHeader, CardBody, CardFooter} from "@
 import {useState} from 'react'
 import {LoginFormSchema} from "@/app/lib/LoginFormSchema"
 import {signIn} from "@/app/actions/auth"
-import {redirect} from "next/navigation";
 
 const Login = () => {
     const [errors, setErrors] = useState<any>({})
@@ -24,7 +23,7 @@ const Login = () => {
             placeholder: 'Passwort eingeben',
             title: 'Passwort',
             type: 'password',
-            autoComplete: 'password'
+            autoComplete: 'current-password'
         }
     ]
 

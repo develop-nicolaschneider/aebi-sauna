@@ -5,17 +5,20 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "headers": [
-      {
-        "source": "**",
-        "headers": [
-          {
-            "key": "Set-Cookie",
-            "value": "dampfwage-session; Secure; SameSite=None; HttpOnly"
-          }
-        ]
-      }
     ]
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true
+    }
   }
 }
