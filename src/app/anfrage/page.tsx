@@ -15,7 +15,7 @@ import {
     DateValue, RangeCalendar, useDisclosure, Tooltip, Switch,
 } from "@nextui-org/react"
 import React, {Fragment, useCallback, useEffect, useState} from "react"
-import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
+import {AnfrageFormSchema} from "@/app/lib/AnfrageFormSchema"
 import {Checkbox} from "@nextui-org/checkbox"
 import {Link} from "@nextui-org/link"
 import {ModalComponent} from "@/components/ModalComponent"
@@ -370,10 +370,10 @@ export default function Anfrage() {
                         <h1 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl md:col-span-2">Anfrage
                             senden</h1>
                         <p className="text-xs sm:text-xs md:text-sm lg:text-base mb-2 md:col-span-2 text-center">
-                            Sende Deine Anfrage zur Saunamiete jetzt! Wähle Deine unverbindlichen Wunschdaten zur Saunamiete direkt
-                            im
-                            Kalender.
-                            Bei Fragen und Miete von längerer Dauer nutze das Feld
+                            Sende Deine Anfrage zur Saunamiete jetzt! Wähle Deine unverbindlichen Wunschdaten direkt
+                            im Kalender.
+                            Bei Fragen, Miete von längerer Dauer oder <span className="font-bold">&nbsp;abweichender
+                            Lieferadresse&nbsp;</span> nutze das Feld
                             <span className="font-bold">&nbsp;Bemerkungen&nbsp;</span>oder sende mir eine E-Mail:
                             <Link
                                 className="text-xs sm:text-xs md:text-sm lg:text-base"
@@ -469,7 +469,8 @@ export default function Anfrage() {
                                     weekdayStyle="short"
                                 />
                             </Tooltip>
-                            <Switch name="date-switch" size="sm" isSelected={isDateSelected} onValueChange={setIsDateSelected}>
+                            <Switch name="date-switch" size="sm" isSelected={isDateSelected}
+                                    onValueChange={setIsDateSelected}>
                                 Wunschdatum wählen
                             </Switch>
                             <small className="text-center text-zinc-400 leading-5 max-w-sm">

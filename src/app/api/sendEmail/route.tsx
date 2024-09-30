@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
+            bcc: 'dampfwage@gmail.com',
             subject: subject,
             html: emailContent,
         }

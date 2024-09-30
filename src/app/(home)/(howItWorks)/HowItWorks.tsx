@@ -29,7 +29,7 @@ const HowItWorks = () => {
         {
             icon: <QuestionAnswerIcon/>,
             title: 'Bestätigung',
-            description: 'Im Anschluss sende ich Dir den Mietvertrag. Du bestätigst mir diesen und bezahlst mir die Miete + Kaution.',
+            description: 'Im Anschluss erhältst Du den Mietvertrag. Du bestätigst mir diesen und bezahlst mir die Miete + Kaution.',
             color: 'bg-yellow-300'
         },
         {
@@ -43,7 +43,7 @@ const HowItWorks = () => {
     const advantages = [
         "Sauniere wo du willst, für 4-6 Personen",
         "Finnischer Holzofen",
-        "Eine Kiste Holz für ca. 4 Stunden saunieren (weitere können dazu gekauft werden)",
+        "Eine Kiste Holz für ca. 4 Stunden saunieren ist inklusive (weitere können dazu gekauft werden)",
         "Saunakübel mit Schöpfkelle für Aufgüsse",
         "Panoramafenster",
         "Vorraum zum Umziehen, Taschen verstauen, Gegenstände deponieren",

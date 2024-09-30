@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react"
 import {getBookings, updateBooking} from "@/utils/firebase"
 import {CalendarDate, getLocalTimeZone, parseDate, today} from "@internationalized/date"
-import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
+import {AnfrageFormSchema} from "@/app/lib/AnfrageFormSchema"
 import styles from "@/app/anfrage/page.module.css"
 import {Booking} from "@/types/Booking"
 

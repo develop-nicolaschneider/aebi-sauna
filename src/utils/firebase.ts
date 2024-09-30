@@ -1,8 +1,8 @@
 'use server'
 
 import {BookingState} from "@/types/BookingState"
-import {AnfrageFormSchema} from "@/utils/AnfrageFormSchema"
-import {verifySession} from "@/utils/session"
+import {AnfrageFormSchema} from "@/app/lib/AnfrageFormSchema"
+import {verifySession} from "@/app/lib/dal"
 import {BookingUser} from "@/types/BookingUser"
 import {Booking} from "@/types/Booking"
 import {db} from "../../config/firebaseAdmin"

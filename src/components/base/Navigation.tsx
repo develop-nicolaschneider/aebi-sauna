@@ -16,10 +16,9 @@ import {
 import NextLink from "next/link"
 import DampfwageLogo from "@/components/DampfwageLogo"
 import clsx from "clsx"
-import {useUserSession} from "@/hooks/use-user-session";
-import {signOut} from "@/utils/firebaseAuth";
-import {deleteSession} from "@/utils/session";
-import LogoutIcon from "@mui/icons-material/Logout";
+import {useUserSession} from "@/hooks/use-user-session"
+import LogoutIcon from "@mui/icons-material/Logout"
+import {logout} from "@/app/actions/auth"
 
 interface NavigationProps {
     session: null | string
@@ -32,8 +31,7 @@ const Navigation = ({session}: NavigationProps) => {
     const userSessionId = useUserSession(session);
 
     const handleSignOut = async () => {
-        await signOut()
-        await deleteSession()
+        await logout()
     }
 
     useEffect(() => {

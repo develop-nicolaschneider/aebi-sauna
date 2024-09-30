@@ -2,14 +2,13 @@
 
 import {Button, Input, Checkbox, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react"
 import {useState} from 'react'
-import {LoginFormSchema} from "@/utils/LoginFormSchema"
-import {signIn} from "@/utils/firebaseAuth"
-import {useRouter} from "next/navigation"
+import {LoginFormSchema} from "@/app/lib/LoginFormSchema"
+import {signIn} from "@/app/actions/auth"
+import {redirect} from "next/navigation";
 
 const Login = () => {
     const [errors, setErrors] = useState<any>({})
     const [submitting, setSubmitting] = useState(false)
-    const router = useRouter()
     const loginFields = [
         {
             name: 'email',
@@ -39,26 +38,10 @@ const Login = () => {
             setSubmitting(false)
             return
         }
-        const rememberMe = data.rememberMe !== undefined
         try {
-            const userUid = await signIn(result.data)
-            if (userUid !== undefined) {
-                const idToken = await userUid.getIdToken()
-                const response = await fetch('api/session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ idToken, rememberMe: rememberMe }),
-                })
-                if (!response.ok) {
-                    console.error(response)
-                } else {
-                    router.push('/dashboard')
-                }
-            }
+            await signIn(data)
         } catch (error: any) {
-            console.error(error.message);
+            console.error(error.message)
         }
         setErrors({})
         setSubmitting(false)

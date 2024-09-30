@@ -51,7 +51,7 @@ const Price = () => {
         {
             title: 'Lieferkosten',
             price: 'CHF 1.50.-/km',
-            subtitle: 'Distanz mehr als 5km von Koppigen',
+            subtitle: 'Distanz mehr als 5 km von Koppigen',
             description: 'Die Distanz wird anhand von Google Maps berechnet.\n' +
                 'Geliefert wird in der Region Bern, Solothurn, Oberaargau & Emmental.\n' +
                 'Anlieferung und Abholung werden ab 3425 Koppigen berechnet.'
@@ -80,7 +80,7 @@ const Price = () => {
                     Preise
                 </h1>
                 <p className="text-xs sm:text-xs md:text-sm lg:text-base mb-2 col-span-1 lg:col-span-2 text-center">
-                    Alle Preise vorbehalten. Der definitive Preis erhältst Du mit der Bestätigung der Anfrage und dem
+                    Alle Preise vorbehalten. Die definitiven Kosten erhältst Du mit der Bestätigung der Anfrage und dem
                     Mietvertrag.
                 </p>
                 <Fade triggerOnce cascade damping={0.2} delay={500} className="grid justify-items-center w-full">
