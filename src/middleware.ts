@@ -10,7 +10,7 @@ export default async function middleware(req: NextRequest) {
     const isProtectedRoute = protectedRoutes.includes(path)
     const isPublicRoute = publicRoutes.includes(path)
 
-    const cookie = cookies().get('dampfwage-session')?.value
+    const cookie = cookies().get('__session')?.value
     const session = await decrypt(cookie)
     if (isProtectedRoute && !session?.uid) {
         return NextResponse.redirect(new URL('/login', req.nextUrl))

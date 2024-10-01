@@ -8,7 +8,7 @@ import {redirect} from "next/navigation"
 import { cache } from 'react'
 
 export const verifySession = cache(async () => {
-    const cookie = cookies().get('dampfwage-session')?.value
+    const cookie = cookies().get('__session')?.value
     const session = await decrypt(cookie)
 
     if (!session?.uid) {

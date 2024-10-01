@@ -11,7 +11,7 @@ type SessionPayload = {
 }
 
 const cookie = {
-    name: 'dampfwage-session',
+    name: '__session',
     expirationTime: '1d',
     expirationTimeLong: '7d',
     maxAge: 24 * 60 * 60 * 1000,
