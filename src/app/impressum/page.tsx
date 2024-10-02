@@ -2,9 +2,7 @@
 
 import React from "react"
 import {Fade} from "react-awesome-reveal"
-import {Link} from "@nextui-org/link";
-import {getLocalTimeZone, today} from "@internationalized/date";
-import ConvertToChDate from "@/utils/ConvertToChDate";
+import {Link} from "@nextui-org/link"
 
 const Impressum = () => {
     const impressumContent = [
@@ -89,7 +87,7 @@ const Impressum = () => {
                     </div>
                 ))}
                 <small className="text-zinc-600 text-center">
-                    {ConvertToChDate(today(getLocalTimeZone()).toString(), 'dy')}
+                    Oktober 2024
                 </small>
             </div>
         </Fade>

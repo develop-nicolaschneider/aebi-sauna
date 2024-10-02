@@ -18,16 +18,18 @@ import SearchIcon from '@mui/icons-material/Search'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import CommentIcon from '@mui/icons-material/Comment'
+import AttachFileIcon from '@mui/icons-material/AttachFile'
 import {EditBookingModal} from "@/components/EditBookingModal"
 import {ModalComponent} from "@/components/ModalComponent"
 import {BookingTable} from "@/components/BookingTable"
 import {getLocalTimeZone, parseDate, today} from "@internationalized/date"
 import {Booking} from "@/types/Booking"
-import CommentIcon from '@mui/icons-material/Comment'
 import {BookingUser} from "@/types/BookingUser"
 import {Link} from "@nextui-org/link"
 import {Loading, LoadingAnimation} from "@/components/base/Loading"
-import {verifySession} from "@/app/lib/dal";
+import {verifySession} from "@/app/lib/dal"
+import {ContractBookingModal} from "@/components/ContractBookingModal"
 
 const bookingColumns = [
     {key: "user", label: "Kontakt"},
@@ -48,8 +50,10 @@ const DashboardComponent = () => {
     const [, setSelectedState] = useState<SharedSelection>(new Set([]))
     const {isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange} = useDisclosure()
     const {isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteOpenChange} = useDisclosure()
+    const {isOpen: isContractOpen, onOpen: onContractOpen, onOpenChange: onContractOpenChange} = useDisclosure()
     const [, setStateBooking] = useState<Booking>()
     const [editBooking, setEditBooking] = useState<Booking>()
+    const [contractBooking, setContractBooking] = useState<Booking>()
     const [modalContent, setModalContent] = useState({
         title: "",
         handleAction: () => {
@@ -164,6 +168,12 @@ const DashboardComponent = () => {
 
     const handleEditReload = () => {
         list.reload()
+    }
+
+    const handleCreateContract = (booking: Booking) => {
+        setContractBooking(booking)
+        console.log('create-contract', booking)
+        onContractOpen()
     }
 
     const handleDeleteModal = (booking: Booking) => {
@@ -454,20 +464,43 @@ const DashboardComponent = () => {
                 return (ConvertToChDate(booking.booking_date, 'sd-full'))
             case 'edit':
                 return (
-                    <div className="relative flex items-center gap-2">
+                    <div className="relative flex items-center gap-0">
                         <Tooltip content="Anfrage Bearbeiten">
-                        <span onClick={() => handleEditModal(booking)}
-                              className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <EditIcon fontSize="small"/>
-                        </span>
+                            <Button
+                                isIconOnly
+                                size="sm"
+                                variant="light"
+                                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                                onPress={() => handleEditModal(booking)}
+                            >
+                                <EditIcon fontSize="small"/>
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="Mietvertrag erstellen">
+                            <Button
+                                title={booking.booking_from === '' || booking.booking_to === '' ? 'Daten ungültig' : undefined}
+                                isDisabled={booking.booking_from === '' || booking.booking_to === ''}
+                                isIconOnly
+                                size="sm"
+                                variant="light"
+                                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                                onPress={() => {
+                                    handleCreateContract(booking)
+                                }}>
+                                <AttachFileIcon color="info" fontSize="small"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Anfrage löschen">
-                            <span onClick={() => {
-                                handleDeleteModal(booking)
-                            }}
-                                  className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <DeleteForeverIcon color="error" fontSize="small"/>
-                        </span>
+                            <Button
+                                isIconOnly
+                                size="sm"
+                                variant="light"
+                                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                                onPress={() => {
+                                    handleDeleteModal(booking)
+                                }}>
+                                <DeleteForeverIcon color="error" fontSize="small"/>
+                            </Button>
                         </Tooltip>
                     </div>
                 )
@@ -520,10 +553,14 @@ const DashboardComponent = () => {
                     handleEditReload={handleEditReload}
                 />
             }
-            < ModalComponent
+            <ModalComponent
                 isOpen={isDeleteOpen}
                 onOpenChange={onDeleteOpenChange}
                 modalContent={modalContent}/>
+            <ContractBookingModal
+                isOpen={isContractOpen}
+                onOpenChange={onContractOpenChange}
+                booking={contractBooking}/>
         </Loading>
     )
 }

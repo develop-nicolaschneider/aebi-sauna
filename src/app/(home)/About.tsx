@@ -8,7 +8,7 @@ import aboutImage from '../../../public/images/about/about-tobias.jpg'
 const About = () => {
     return (
         <Fade triggerOnce duration={500} cascade damping={0.2} delay={200}>
-            <div id="about"
+            <div id="ueber-mich"
                  className="grid grid-flow-row-dense grid-cols-1 md:grid-cols-2 gap-4 justify-items-center content-center py-7">
                 <h1 className="col-span-1 md:col-span-2 font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
                     Über mich

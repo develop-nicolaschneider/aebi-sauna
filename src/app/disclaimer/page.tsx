@@ -1,7 +1,5 @@
 'use client'
 
-import ConvertToChDate from "@/utils/ConvertToChDate"
-import {getLocalTimeZone, today} from "@internationalized/date"
 import {Fade} from "react-awesome-reveal"
 import React from "react"
 
@@ -32,7 +30,7 @@ const Disclaimer = () => {
                     </div>
                 </div>
                 <small className="text-zinc-600 text-center">
-                    {ConvertToChDate(today(getLocalTimeZone()).toString(), 'dy')}
+                    Oktober 2024
                 </small>
             </div>
         </Fade>

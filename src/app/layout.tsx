@@ -13,11 +13,21 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
-    title: "Dampfwage",
-    description:
-        "Die mobile Sauna in Deiner Umgebung! " +
-        "Miete die Holzsauna auf rädern und lasse sie direkt vor Deine Haustür liefern. " +
-        "Sende Deine Anfrage mit Deinen Wunschdaten jetzt!",
+    title: 'Dampfwage',
+    applicationName: 'Dampfwage',
+    category: "mobile Sauna",
+    keywords: [
+        'Dampfwage',
+        'mobile Sauna',
+        'mobile Sauna mieten',
+        'Koppigen',
+        'Tobias Aebi',
+    ],
+    description: 'Willkommen bei Dampfwage, Deiner Anlaufstelle für pure Entspannung! ' +
+        'Hier kannst Du die mobile Sauna mieten und Dir direkt an Deinen Wunschort liefern lassen - ' +
+        'egal ob zu zweit, mit Freunden, Kollegen oder für ein Teamevent jeder Art.' +
+        'Der traditionell finnische Holzofen sorgt für ein gemütliches Wellness-Erlebnis. ' +
+        'Miete jetzt den Dampfwage - die mobile Sauna geliefert ab 3425 Koppigen.'
 }
 
 export default function RootLayout({children}: { children: React.ReactNode }) {

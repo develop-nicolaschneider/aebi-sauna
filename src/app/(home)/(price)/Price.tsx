@@ -74,7 +74,7 @@ const Price = () => {
 
     return (
         <Fade triggerOnce duration={500} delay={200}>
-            <div id="price"
+            <div id="preise"
                  className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 gap-x-8 justify-items-center content-center py-7">
                 <h1 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl col-span-1 lg:col-span-2">
                     Preise
@@ -92,7 +92,6 @@ const Price = () => {
                     <Link
                         isExternal
                         href="/files/Nutzungsbedingungen.pdf"
-                        target="_blank"
                         as={NextLink}
                         className="text-xs sm:text-xs md:text-sm lg:text-base leading-4">
                         &nbsp;Nutzungsbedingungen&nbsp;

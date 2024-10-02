@@ -53,7 +53,7 @@ const HowItWorks = () => {
 
     return (
         <Fade triggerOnce duration={500} delay={200}>
-            <div id="howItWorks"
+            <div id="so-funktionierts"
                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-items-center content-center py-7">
                 <h1 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl col-span-1 sm:col-span-2 lg:col-span-4">
                     So funktioniert&apos;s

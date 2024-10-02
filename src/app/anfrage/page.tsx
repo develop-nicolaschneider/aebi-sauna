@@ -193,7 +193,6 @@ export default function Anfrage() {
             name: "usageRegulations",
             text: "Nutzungsbestimmungen",
             modalContent: {
-                title: "Nutzungsbestimmungen",
                 handleAction: () => handleModalAction(true),
                 actionText: "Akzeptieren",
                 content: <UsageProtectionComponent/>,
@@ -395,7 +394,7 @@ export default function Anfrage() {
                                         placeholder={field.placeholder}
                                         title={field.title}
                                         type={field.type === 'number' ? 'text' : field.type}
-                                        inputMode={field.type === 'number' || 'tel' ? 'numeric' : field.type}
+                                        inputMode={field.type === 'number' || field.type === 'tel' ? 'numeric' : field.type}
                                         autoComplete={field.autoComplete}
                                         isInvalid={!!errors?.fieldErrors?.[field.name]}
                                         errorMessage={errors?.fieldErrors?.[field.name]}

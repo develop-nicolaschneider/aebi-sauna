@@ -108,7 +108,7 @@ const Navigation = ({session}: NavigationProps) => {
                         onPress={() => setIsMenuOpen(false)}
                         color="foreground"
                         className="w-full font-bold"
-                        href="/#howItWorks">
+                        href="/#so-funktionierts">
                         So funktioniert&apos;s
                     </Link>
                 </NavbarMenuItem>
@@ -126,7 +126,7 @@ const Navigation = ({session}: NavigationProps) => {
                         onPress={() => setIsMenuOpen(false)}
                         color="foreground"
                         className="w-full font-bold"
-                        href="/#price">
+                        href="/#preise">
                         Preise
                     </Link>
                 </NavbarMenuItem>
@@ -136,7 +136,7 @@ const Navigation = ({session}: NavigationProps) => {
                         onPress={() => setIsMenuOpen(false)}
                         color="foreground"
                         className="w-full font-bold"
-                        href="/#about">
+                        href="/#ueber-mich">
                         Über mich
                     </Link>
                 </NavbarMenuItem>

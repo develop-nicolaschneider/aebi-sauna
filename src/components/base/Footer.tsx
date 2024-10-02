@@ -1,3 +1,5 @@
+'use client'
+
 import EmailIconOutlined from '@mui/icons-material/EmailOutlined'
 import {Divider, link, Link} from "@nextui-org/react"
 import clsx from "clsx"
@@ -31,7 +33,6 @@ export default function Footer() {
                 <Link
                     isExternal
                     href="/files/Nutzungsbedingungen.pdf"
-                    target="_blank"
                     as={NextLink}
                     className="text-xs sm:text-sm">
                     Nutzungsbedingungen
