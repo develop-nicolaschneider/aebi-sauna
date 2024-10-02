@@ -15,13 +15,6 @@ export async function POST(req: Request) {
             paragraphLoop: true,
             linebreaks: true,
         })
-        console.log(booking)
-        console.log(data)
-        console.log(ConvertToChDate(booking.booking_from.toString(), 'md') as string || '',
-            ConvertToChDate(booking.booking_to.toString(), 'md') as string || '',
-            ConvertToChDate(`1970-01-01T${data.fromTime.toString()}Z`, 'st') as string || '',
-            ConvertToChDate(`1970-01-01T${data.toTime.toString()}Z`, 'st') as string || '',
-        )
         doc.setData({
             bookingName: `${booking.user.firstName} ${booking.user.lastName}` || '',
             bookingStreet: booking.user.street.toString() || '',

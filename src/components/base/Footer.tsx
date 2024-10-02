@@ -31,6 +31,7 @@ export default function Footer() {
                 </Link>
                 <Divider orientation="vertical" className="hidden sm:inline bg-zinc-400"/>
                 <Link
+                    prefetch
                     isExternal
                     href="/files/Nutzungsbedingungen.pdf"
                     as={NextLink}

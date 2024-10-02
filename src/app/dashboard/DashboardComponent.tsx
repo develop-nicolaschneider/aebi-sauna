@@ -172,7 +172,6 @@ const DashboardComponent = () => {
 
     const handleCreateContract = (booking: Booking) => {
         setContractBooking(booking)
-        console.log('create-contract', booking)
         onContractOpen()
     }
 
