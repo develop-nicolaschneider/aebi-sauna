@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     try {
         const {email, subject, booking}: EmailProps = await req.json()
         const {renderToStaticMarkup} = await import( "react-dom/server" )
-        const imageSrc = 'https://dampfwage.ch/images/icons/dampfwage-quadrat.svg'
+        const imageSrc = 'https://dampfwage.ch/images/icons/dampfwage-quadrat.png'
         const emailContent = renderToStaticMarkup(<RequestSentEmailTemplate booking={booking} imageSrc={imageSrc}/>)
         const transporter = nodemailer.createTransport({
             host: process.env.GMAIL_HOST,
