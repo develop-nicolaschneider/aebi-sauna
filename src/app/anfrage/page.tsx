@@ -335,7 +335,7 @@ export default function Anfrage() {
                     headers: {'content-type': 'application/json'},
                     body: JSON.stringify({
                         email: booking.user?.email,
-                        subject: 'Anfrage bestätigt',
+                        subject: 'Anfrage Dampfwage',
                         booking: booking
                     })
                 })
