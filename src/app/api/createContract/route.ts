@@ -4,6 +4,7 @@ import PizZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
 import { NextResponse } from 'next/server'
 import ConvertToChDate from "@/utils/ConvertToChDate"
+import {getLocalTimeZone, today} from "@internationalized/date"
 
 export async function POST(req: Request) {
     try {
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
             linebreaks: true,
         })
         doc.setData({
+            contractDate: ConvertToChDate(today(getLocalTimeZone()).toString(), 'bd') as string || '',
             bookingName: `${booking.user.firstName} ${booking.user.lastName}` || '',
             bookingStreet: booking.user.street.toString() || '',
             bookingCity:  `${booking.user.postalCode} ${booking.user.city}` || '',
@@ -23,8 +25,9 @@ export async function POST(req: Request) {
             bookingEmail: booking.user.id.toString() || '',
             fromDate: ConvertToChDate(booking.booking_from.toString(), 'bd') as string || '',
             toDate: ConvertToChDate(booking.booking_to.toString(), 'bd') as string || '',
-            fromTime: ConvertToChDate(`1970-01-01T${data.fromTime.toString()}Z`, 'st') as string || '',
-            toTime: ConvertToChDate(`1970-01-01T${data.toTime.toString()}Z`, 'st') as string || '',
+            fromTime: ConvertToChDate(`1970-01-01T${data.fromTime.toString()}`, 'st') as string || '',
+            toTime: ConvertToChDate(`1970-01-01T${data.toTime.toString()}`, 'st') as string || '',
+            priceDeposit: data.priceDeposit.toString() || '',
             priceSauna: data.priceSauna.toString() || '',
             priceWood: data.priceWood.toString() || '',
             priceDelivery: data.priceDelivery.toString() || '',

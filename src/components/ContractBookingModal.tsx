@@ -14,6 +14,7 @@ type ModalProps = {
 }
 
 export const ContractBookingModal = ({isOpen, onOpenChange, booking}: ModalProps) => {
+    const [priceDeposit, setPriceDeposit] = useState(0)
     const [priceSauna, setPriceSauna] = useState(0)
     const [priceWood, setPriceWood] = useState(0)
     const [priceDelivery, setPriceDelivery] = useState(0)
@@ -26,6 +27,7 @@ export const ContractBookingModal = ({isOpen, onOpenChange, booking}: ModalProps
 
     useEffect(() => {
         // Reset the form values
+        setPriceDeposit(0)
         setPriceSauna(0)
         setPriceWood(0)
         setPriceDelivery(0)
@@ -34,6 +36,7 @@ export const ContractBookingModal = ({isOpen, onOpenChange, booking}: ModalProps
     }, [onOpenChange])
 
     const onCloseRef = useRef(() => {
+        setPriceDeposit(0)
         setPriceSauna(0)
         setPriceWood(0)
         setPriceDelivery(0)
@@ -122,6 +125,19 @@ export const ContractBookingModal = ({isOpen, onOpenChange, booking}: ModalProps
                                     name="toTime"
                                     defaultValue={new Time(18)}
                                     size="sm"
+                                />
+                                <Input
+                                    variant="underlined"
+                                    id="priceDeposit"
+                                    name="priceDeposit"
+                                    type="number"
+                                    inputMode="numeric"
+                                    label="Mietkaution"
+                                    value={priceDeposit.toFixed(0)}
+                                    onChange={e => setPriceDeposit(Number(e.target.value))}
+                                    endContent={endContent}
+                                    size="sm"
+                                    className="appearance-none"
                                 />
                                 <Input
                                     variant="underlined"
