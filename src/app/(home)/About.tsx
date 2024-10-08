@@ -27,10 +27,11 @@ const About = () => {
                     «Dampfwage» entstanden.
                 </q>
                 <p className="row-span-1 md:row-span-2 lg:row-span-1 text-xs sm:text-xs md:text-sm lg:text-base mb-2 text-center content-center">
-                    «Dampfwage» habe ich ins Leben gerufen, weil ich gerne sauniere, um die kalten Wintermonate angenehmer zu gestalten und weil es einfach sehr gesund und entspannend ist.
-                    Da ich gerne kleinere Projekte verwirkliche, wurde aus einer Idee Wirklichkeit,
-                    In Eigenregie baute ich mir den Dampfwagen ganz nach meinen Wünschen und Vorstellungen.
-                    Gerne Teile ich jetzt das Erlebnis der mobilen Sauna.<br/>
+                    «Dampfwage» habe ich ins Leben gerufen, weil ich gerne sauniere, um die kalten Wintermonate
+                    angenehmer zu gestalten und weil es einfach sehr gesund und entspannend ist. Da ich gerne kleinere
+                    Projekte verwirkliche, wurde aus einer Idee Wirklichkeit. In Eigenregie baute ich mir den
+                    «Dampfwage» ganz nach meinen Wünschen und Vorstellungen. Gerne Teile ich jetzt das Erlebnis der
+                    mobilen Sauna.<br/>
                     <small className="leading-loose block pt-2">Tobias Aebi</small>
                 </p>
             </div>
