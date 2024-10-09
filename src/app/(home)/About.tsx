@@ -26,7 +26,7 @@ const About = () => {
                     «Dampfwage» habe ich ins Leben gerufen, weil ich gerne sauniere, um die kalten Wintermonate
                     angenehmer zu gestalten und weil es einfach sehr gesund und entspannend ist. Da ich gerne kleinere
                     Projekte verwirkliche, wurde aus einer Idee Wirklichkeit. In Eigenregie baute ich mir den
-                    «Dampfwage» ganz nach meinen Wünschen und Vorstellungen. Gerne Teile ich jetzt das Erlebnis der
+                    «Dampfwage» ganz nach meinen Wünschen und Vorstellungen. Gerne teile ich jetzt das Erlebnis der
                     mobilen Sauna.<br/>
                     <small className="leading-loose block pt-2">Tobias Aebi</small>
                 </p>
