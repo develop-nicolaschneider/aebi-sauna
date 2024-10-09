@@ -29,7 +29,7 @@ const Dampfwage = () => {
             key: 'card-2',
             img: [work_01, work_02, work_03],
             title: "Bau",
-            description: "Die Sauna wurde selbst gebaut und besteht aus massivem Fichtenholz. Der Eckbank bietet Platz für ca. 4 bis maximal 6 Personen.",
+            description: "Die Sauna wurde selbst gebaut und besteht aus massivem Fichtenholz. Die Eckbank bietet Platz für ca. 4 bis maximal 6 Personen.",
         },
         {
             key: 'card-3',
