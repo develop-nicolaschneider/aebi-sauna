@@ -28,7 +28,7 @@ const Price = () => {
             description: 'Geniesse den Dampfwagen eine ganze Woche lang!'
         },
         {
-            title: '2 Woche',
+            title: '2 Wochen',
             price: 'CHF 720.-',
             subtitle: '14 Tage am Stück schwitzen',
             description: 'Geniesse den Dampfwagen zwei ganze Wochen lang!'
